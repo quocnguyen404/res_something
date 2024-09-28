@@ -17,7 +17,7 @@ public abstract class Employee
     @Override
     public String toString() 
     {
-        return String.format("Employee: [Role: %s] [Name: %s] [ID: %d]\n", role, name, id);
+        return String.format("Employee: [Role: %s] [Name: %s] [ID: %d]", role, name, id);
     }
     
     //getter setter

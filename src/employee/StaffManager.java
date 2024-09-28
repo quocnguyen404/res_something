@@ -9,14 +9,9 @@ public class StaffManager
     
     public StaffManager()
     {
+        staffs = new ArrayList<Staff>();
         //open database if not exist init with no data
         //db exist init with db
-        staffs = new ArrayList<Staff>();
-    }
-
-    public List<Staff> getEmployee()
-    {
-        return staffs;
     }
 
     public Staff findStaff(String name)
