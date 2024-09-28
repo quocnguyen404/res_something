@@ -1,0 +1,20 @@
+uml tabel:
+    draw.io
+
+package:
+    - employee
+    - customer
+    - statistic
+    - services
+
+employee:
+    - employee: staff, manager
+    - manager: add, remove, find
+
+customer:
+    - manager
+    - feedback
+    - order food
+
+product:
+    - manager
