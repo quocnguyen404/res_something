@@ -17,6 +17,6 @@ customer:
     - order food
 
 product:
-    - manager
+    - manager: add, remove dishes
     - order
     
