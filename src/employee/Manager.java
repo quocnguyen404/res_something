@@ -7,4 +7,10 @@ public class Manager extends Employee
         super(name);
         setRole(Role.Manager);
     }
+
+    Manager(String name, int id)
+    {
+        super(name, id);
+        setRole(Role.Manager);
+    }
 }

@@ -11,7 +11,19 @@ public abstract class Employee
     public Employee(String name)
     {
         this.name = name;
-        id = hashCode();
+        id = hashCode();        
+    }
+
+    //visible in package
+    Employee(String name, int id)
+    {
+        this.name = name;
+        this.id = id;
+    }
+
+    public String toData()
+    {
+        return String.format("%s %s %s", role, name, id);
     }
 
     @Override

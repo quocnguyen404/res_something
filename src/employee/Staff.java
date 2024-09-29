@@ -7,4 +7,10 @@ public class Staff extends Employee
         super(name);
         setRole(Role.Staff);
     }
+
+    Staff(String name, int id)
+    {
+        super(name, id);
+        setRole(Role.Staff);
+    }
 }

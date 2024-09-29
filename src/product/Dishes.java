@@ -9,14 +9,23 @@ import java.util.Set;
 public class Dishes 
 {
     private static String dishPath = "\\data\\dishes.dat";
-
-    private static Dishes instance = new Dishes();
     private Map<String, Float> dishes;
+    
+    //Singleton
+    private static Dishes instance = new Dishes();
+    public static Dishes Instance()
+    {
+        return instance;
+    }
 
     private Dishes()
     {
         dishes = new HashMap<String, Float>();
-        
+        loadData();
+    }
+
+    private void loadData()
+    {
         try
         {
             FileReader fr = new FileReader(System.getProperty("user.dir")+dishPath);
@@ -36,11 +45,6 @@ public class Dishes
         {
             System.out.println("Exception: " + e.getMessage());
         }
-    }
-
-    public static Dishes Instance()
-    {
-        return instance;
     }
 
     public Set<String> getDishNames()
