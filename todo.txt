@@ -1,22 +1,30 @@
 uml tabel:
     draw.io
 
+mvc model
+
 package:
-    - employee
-    - customer
-    - statistic
+    - common
+    - controller
+    - dao
+    - repository
     - services
 
-employee:
-    - employee: staff, manager
-    - manager: add, remove, find
+common:
+    - constant
 
-customer:
-    - manager
+controller:
+    - 
+
+dao:
     - feedback
-    - order food
-
-product:
-    - manager: add, remove dishes
+    - user
+    - (user) employee
     - order
-    
+    - orders
+
+repository:
+    - interface repository
+    - dish repository
+    - employee repository
+    - user

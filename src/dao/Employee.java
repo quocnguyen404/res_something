@@ -1,21 +1,19 @@
-package employee;
+package dao;
 
-public abstract class Employee 
+public class Employee extends User
 {
-    public enum Role { Staff, Manager }
-
-    private Role role;
     private String name;
     private int id;    
 
-    public Employee(String name)
+    public Employee(String name, Role role)
     {
         this.name = name;
+        this.role = role;
         id = hashCode();        
     }
 
-    //visible in package
-    Employee(String name, int id)
+    //only visible in package
+    public Employee(String name, Role role, int id)
     {
         this.name = name;
         this.id = id;
@@ -38,10 +36,7 @@ public abstract class Employee
         return name;
     }
 
-    public Role getRole()
-    {
-        return role;
-    }
+
 
     public int getID()
     {

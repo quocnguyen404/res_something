@@ -1,4 +1,4 @@
-package product;
+package dao;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -20,13 +20,15 @@ public class Orders
     public void addOrder(Order order)
     {
         orders.add(order);
-        totalPrice += Dishes.Instance().getPrice(order.dishName) * order.quantity;
+        //TODO
+        //totalPrice += Dishes.Instance().getPrice(order.dishName) * order.quantity;
     }
 
     public void removeOrder(Order order)
     {
         orders.remove(order);
-        totalPrice -= Dishes.Instance().getPrice(order.dishName) * order.quantity;
+        //TODO
+        //totalPrice -= Dishes.Instance().getPrice(order.dishName) * order.quantity;
     }
 
     //getter setter

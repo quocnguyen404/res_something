@@ -1,4 +1,4 @@
-package product;
+package dao;
 
 public class Order 
 {
