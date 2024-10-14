@@ -1,95 +1,98 @@
 package repository;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.BufferedWriter; 
-import java.io.FileWriter; 
-import java.io.PrintWriter;
-import java.util.Map;
-import java.util.HashMap;
-
 import dao.Employee;
-import dao.Employee.Role;
+import dao.Role;
+import dao.WorkShift;
 
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class EmployeeRepository implements Repository<Integer, Employee>
-{
-    private static String staffPath = "\\data\\staffs.dat";
-    private Map<Integer, Employee> relations = new HashMap<>();
-    
-    public EmployeeRepository()
-    {
-        loadData();
+import common.AppConstant;
+
+public class EmployeeRepository {
+    private final String employeeFile = AppConstant.DATA_PREFIX+"staffs"+AppConstant.DATA_SUFFIX;
+    private Map<Integer, Employee> employeeMap;
+
+    public EmployeeRepository() {
+        this.employeeMap = loadEmployees();
     }
 
-    public void loadData()
-    {
-        try
-        {
-            FileReader fr = new FileReader(System.getProperty("user.dir")+staffPath);
-            BufferedReader br = new BufferedReader(fr);
+    // Add a new employee
+    public void addEmployee(Employee employee) {
+        employeeMap.put(employee.getEmployeeID(), employee);
+        saveEmployees();
+    }
 
-            String line;
-            while((line = br.readLine()) != null)
-            {
-                String[] info = new String[3];
-                info = line.split(" ");
-                Employee s = new Employee(info[1], Role.Staff,Integer.parseInt(info[2]));
-                relations.put(s.getID(), s);
+    // Update an existing employee
+    public void updateEmployee(Employee employee) {
+        if (employeeMap.containsKey(employee.getEmployeeID())) {
+            employeeMap.put(employee.getEmployeeID(), employee);
+            saveEmployees();
+        } else {
+            System.out.println("Employee not found.");
+        }
+    }
+
+    // Get employee by ID
+    public Employee getEmployee(int employeeID) {
+        return employeeMap.get(employeeID);
+    }
+
+    // Save all employees to the file
+    private void saveEmployees() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(employeeFile))) {
+            for (Employee employee : employeeMap.values()) {
+                writer.write(employee.getEmployeeID() + "," +
+                             employee.getUserName() + "," +
+                             employee.getFirstName() + "," +
+                             employee.getLastName() + "," +
+                             employee.getRole() + "," +
+                             employee.getWorkShift() + "," +
+                             employee.getSalary() + "," +
+                             employee.getWorkHours() + "," +
+                             employee.getProductivity());
+                writer.newLine();
             }
-
-            br.close();
-        }
-        catch (Exception e) 
-        {
-            System.out.println("Exception: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void saveData()
-    {
-        try
-        {
-            FileWriter fw = new FileWriter(System.getProperty("user.dir")+staffPath);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter pr = new PrintWriter(bw);
-            for (Employee employee : relations.values())
-                pr.println(employee.toData());
-            pr.close();
-        }
-        catch (Exception e)
-        {
-            System.out.println("Exception: " + e.getMessage());
-        }
-    }
+    // Load employees from the file
+    private Map<Integer, Employee> loadEmployees() {
+        Map<Integer, Employee> employeeMap = new HashMap<>();
+        File file = new File(employeeFile);
 
-    @Override
-    public Employee get(Integer key) 
-    {
-        return relations.get(key);
-    }
-
-    @Override
-    public void add(Integer key, Employee value) 
-    {
-        if(relations.containsKey(key))
-        {
-            System.out.println("Already exist staff: " + key);
-            return;
+        if (!file.exists()) {
+            return employeeMap; // Return empty map if file does not exist
         }
 
-        relations.put(key, value);
-    }
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 9) { // Expecting 9 fields
+                    int employeeID = Integer.parseInt(parts[0]);
+                    String userName = parts[1];
+                    String firstName = parts[2];
+                    String lastName = parts[3];
+                    Role role = Role.valueOf(parts[4]); // Assuming Role enum exists
+                    WorkShift workShift = WorkShift.valueOf(parts[5]); // Parse work shift
+                    double salary = Double.parseDouble(parts[6]);
+                    double workHours = Double.parseDouble(parts[7]);
+                    double productivity = Double.parseDouble(parts[8]);
 
-    @Override
-    public void delete(Integer key) 
-    {
-        if(!relations.containsKey(key))
-        {
-            System.out.println("Not exist staff: " + key + " to delete");
-            return;
+                    Employee employee = new Employee(userName, firstName, lastName, role, employeeID, workShift, salary);
+                    employee.addWorkHours(workHours); // Set initial work hours
+                    employee.setProductivity(productivity); // Set initial productivity
+                    employeeMap.put(employeeID, employee);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        relations.remove(key);
+        return employeeMap;
     }
 }

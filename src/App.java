@@ -1,8 +1,10 @@
+import gui.LoginGUI;
 
 public class App 
 {
     public static void main(String[] args) throws Exception 
     {
-        // StaffRepository sm = new StaffRepository();
+        LoginGUI lg = new LoginGUI();
+        lg.setVisible(true);
     }
 }

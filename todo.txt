@@ -27,4 +27,4 @@ repository:
     - interface repository
     - dish repository
     - employee repository
-    - user
+    - user repository
