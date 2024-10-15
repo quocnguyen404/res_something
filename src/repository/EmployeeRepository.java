@@ -2,97 +2,128 @@ package repository;
 
 import dao.Employee;
 import dao.Role;
+import dao.User;
 import dao.WorkShift;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import common.AppConstant;
 
 public class EmployeeRepository {
-    private final String employeeFile = AppConstant.DATA_PREFIX+"staffs"+AppConstant.DATA_SUFFIX;
-    private Map<Integer, Employee> employeeMap;
+    private static final int ELFD = 6;
+    private static final String EM_DATA_PATH = AppConstant.DATA_PREFIX+"staffs"+AppConstant.DATA_SUFFIX;
+    private static final String EM_TMP_DATA_PATH = AppConstant.DATA_PREFIX+"staffs"+AppConstant.DATA_TEMP_SUFFIX;
+    private Map<String, Employee> employees;
 
     public EmployeeRepository() {
-        this.employeeMap = loadEmployees();
+        loadAllEmployeeFromFile();
     }
 
-    // Add a new employee
-    public void addEmployee(Employee employee) {
-        employeeMap.put(employee.getEmployeeID(), employee);
-        saveEmployees();
+    public List<Employee> getEmployeeList() {
+        return new ArrayList<Employee>(employees.values());
     }
 
-    // Update an existing employee
-    public void updateEmployee(Employee employee) {
-        if (employeeMap.containsKey(employee.getEmployeeID())) {
-            employeeMap.put(employee.getEmployeeID(), employee);
-            saveEmployees();
-        } else {
-            System.out.println("Employee not found.");
-        }
-    }
-
-    // Get employee by ID
-    public Employee getEmployee(int employeeID) {
-        return employeeMap.get(employeeID);
-    }
-
-    // Save all employees to the file
-    private void saveEmployees() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(employeeFile))) {
-            for (Employee employee : employeeMap.values()) {
-                writer.write(employee.getEmployeeID() + "," +
-                             employee.getUserName() + "," +
-                             employee.getFirstName() + "," +
-                             employee.getLastName() + "," +
-                             employee.getRole() + "," +
-                             employee.getWorkShift() + "," +
-                             employee.getSalary() + "," +
-                             employee.getWorkHours() + "," +
-                             employee.getProductivity());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Load employees from the file
-    private Map<Integer, Employee> loadEmployees() {
-        Map<Integer, Employee> employeeMap = new HashMap<>();
-        File file = new File(employeeFile);
-
-        if (!file.exists()) {
-            return employeeMap; // Return empty map if file does not exist
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+    private void loadAllEmployeeFromFile() {
+        employees = new HashMap<String, Employee>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(EM_DATA_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 9) { // Expecting 9 fields
-                    int employeeID = Integer.parseInt(parts[0]);
-                    String userName = parts[1];
-                    String firstName = parts[2];
-                    String lastName = parts[3];
-                    Role role = Role.valueOf(parts[4]); // Assuming Role enum exists
-                    WorkShift workShift = WorkShift.valueOf(parts[5]); // Parse work shift
-                    double salary = Double.parseDouble(parts[6]);
-                    double workHours = Double.parseDouble(parts[7]);
-                    double productivity = Double.parseDouble(parts[8]);
-
-                    Employee employee = new Employee(userName, firstName, lastName, role, employeeID, workShift, salary);
-                    employee.addWorkHours(workHours); // Set initial work hours
-                    employee.setProductivity(productivity); // Set initial productivity
-                    employeeMap.put(employeeID, employee);
-                }
+                String[] tokens = line.split(",");
+                if(tokens.length != ELFD)
+                    throw new Exception("Employee data format wrong");
+                Employee em = dataToEmployee(tokens);
+                employees.put(em.getUserName(), em);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveEmployee(Employee em) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(EM_DATA_PATH, true))) {
+            employees.put(em.getUserName(), em);
+            writer.write(employeeToData(em));
+            writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    public Employee findEmployeeByUserName(String userName) {
+        if(employees.containsKey(userName)) {
+            return employees.get(userName);
+        }
+        return null;
+    }
 
-        return employeeMap;
+    public void updateEmployee(Employee updateEm) {
+        File tempFile = new File(EM_TMP_DATA_PATH);
+        try (BufferedReader reader = new BufferedReader(new FileReader(EM_DATA_PATH));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(",");
+                if (tokens[0].equals(updateEm.getUserName())) {
+                    writer.write(employeeToData(updateEm));
+                } else {
+                    writer.write(line);
+                }
+                writer.newLine();
+            }
+
+            if (!new File(EM_DATA_PATH).delete()) {
+                throw new IOException("Could not delete original file");
+            }
+            if (!tempFile.renameTo(new File(EM_DATA_PATH))) {
+                throw new IOException("Could not rename temp file");
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteUser(String emName) {
+        File tempFile = new File(EM_TMP_DATA_PATH);
+        try (BufferedReader reader = new BufferedReader(new FileReader(EM_DATA_PATH));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(",");
+                if (!tokens[0].equals(emName)) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+            if (!new File(EM_DATA_PATH).delete()) {
+                throw new IOException("Could not delete original file");
+            }
+            if (!tempFile.renameTo(new File(EM_DATA_PATH))) {
+                throw new IOException("Could not rename temp file");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //employee data: 0userName, 1id, 2shift, 3salary, 4workHours, 5productivity
+    private Employee dataToEmployee(String[] tokens) {
+        Employee em = new Employee(Integer.parseInt(tokens[1]), WorkShift.valueOf(tokens[2]),
+                                   Double.parseDouble(tokens[3]), Double.parseDouble(tokens[4]),
+                                   Double.parseDouble(tokens[5]));
+        em.setUserName(tokens[0]);
+        return em;
+    }
+
+    private String employeeToData(Employee em) {
+        return String.format("%s, %s, %s, %s, %s, %s",
+                             em.getUserName(), em.getID(),
+                             em.getWorkShift(), em.getSalary(),
+                             em.getWorkHours(), em.getProductivity());
     }
 }

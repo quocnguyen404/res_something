@@ -6,40 +6,19 @@ import dao.Role;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import common.AppConstant;
 
 public class UserRepository {
-    private static final String filePath = AppConstant.DATA_PREFIX+"users"+AppConstant.DATA_SUFFIX;
+    private static final int ULFD = 6;
+    private static final String USER_DATA_PATH = AppConstant.DATA_PREFIX+"users"+AppConstant.DATA_SUFFIX;
+    private static final String USER_TMP_DATA_PATH = AppConstant.DATA_PREFIX+"users"+AppConstant.DATA_TEMP_SUFFIX;
     private Map<String, User> users;
 
     public UserRepository() {
-        loadUserAllUser();
-    }
-    
-    //user data: 0userName,1encodePW,2firstName,3lastName,4loginCount,5role
-    // Save a new user to the file
-    public void saveUser(User user) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            String userRecord = String.format("%s, %s, %s, %s, %s, %s",
-                                              user.getUserName(), user.getEncodePassword(),
-                                              user.getFirstName(), user.getLastName(),
-                                              user.getLoginCount(), user.getRole());
-            writer.write(userRecord);
-            writer.newLine();
-        }
-    }
-    
-    // Load users from file
-    public void loadUserAllUser() {
-        users = new HashMap<String, User>();
-        List<User> userFromFile = getAllUserFromFile();
-        for (User user : userFromFile) {
-            users.put(user.getUserName(), user);
-        }
+        loadAllUserFromFile();
     }
 
     public List<User> getUserList() {
@@ -47,54 +26,45 @@ public class UserRepository {
     }
 
     // Get all users from the file
-    private List<User> getAllUserFromFile() {
-        List<User> userList = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+    private void loadAllUserFromFile() {
+        users = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(USER_DATA_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(",");
-                if (tokens.length >= 6) {
-                    User user = new User(tokens[0], tokens[1],
-                                         tokens[2], tokens[3],
-                                         Integer.parseInt(tokens[4]),
-                                         Role.valueOf(tokens[5]));
-                    userList.add(user);
-                }
+                if(tokens.length != ULFD)
+                    throw new Exception("User data format wrong");    
+                User user = dataToUser(tokens);
+                users.put(user.getUserName(), user);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Save a new user to the file
+    public void saveUser(User user) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(USER_DATA_PATH, true))) {
+            users.put(user.getUserName(), user);
+            writer.write(userToData(user));
+            writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return userList;
     }
 
     // Find a user by username
-    public User findUserByUserName(String userName) throws IOException {
+    public User findUserByUserName(String userName) {
         if(users.containsKey(userName)) {
             return users.get(userName);
         }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] tokens = line.split(",");
-                if (tokens[0].equals(userName)) {
-
-                    return new User(tokens[0], tokens[1],
-                                    tokens[2], tokens[3],
-                                    Integer.parseInt(tokens[4]),
-                                    Role.valueOf(tokens[5]));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null; // User not found
+        return null;
     }
 
     // Update user data in the file
-    public void updateUser(User updatedUser) throws IOException {
-        File tempFile = new File(filePath + ".tmp");
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
+    public void updateUser(User updatedUser) {
+        File tempFile = new File(USER_TMP_DATA_PATH);
+        try (BufferedReader reader = new BufferedReader(new FileReader(USER_DATA_PATH));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
 
             String line;
@@ -102,29 +72,31 @@ public class UserRepository {
                 String[] tokens = line.split(",");
                 if (tokens[0].equals(updatedUser.getUserName())) {
                     // Write updated user
-                    writer.write(updatedUser.getUserName() + "," + updatedUser.getEncodePassword() + "," +
-                            updatedUser.getFirstName() + "," + updatedUser.getLastName() + "," + updatedUser.getRole());
+                    writer.write(userToData(updatedUser));
                 } else {
                     // Write original user data
                     writer.write(line);
                 }
                 writer.newLine();
             }
+
+            // Delete the original file and rename the temp file
+            if (!new File(USER_DATA_PATH).delete()) {
+                throw new IOException("Could not delete original file");
+            }
+            if (!tempFile.renameTo(new File(USER_DATA_PATH))) {
+                throw new IOException("Could not rename temp file");
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
         }
 
-        // Delete the original file and rename the temp file
-        if (!new File(filePath).delete()) {
-            throw new IOException("Could not delete original file");
-        }
-        if (!tempFile.renameTo(new File(filePath))) {
-            throw new IOException("Could not rename temp file");
-        }
     }
 
     // Delete user by username
-    public void deleteUser(String userName) throws IOException {
-        File tempFile = new File(filePath + ".tmp");
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
+    public void deleteUser(String userName) {
+        File tempFile = new File(USER_TMP_DATA_PATH);
+        try (BufferedReader reader = new BufferedReader(new FileReader(USER_DATA_PATH));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
 
             String line;
@@ -135,14 +107,31 @@ public class UserRepository {
                     writer.newLine();
                 }
             }
+            // Delete the original file and rename the temp file
+            if (!new File(USER_DATA_PATH).delete()) {
+                throw new IOException("Could not delete original file");
+            }
+            if (!tempFile.renameTo(new File(USER_DATA_PATH))) {
+                throw new IOException("Could not rename temp file");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
-        // Delete the original file and rename the temp file
-        if (!new File(filePath).delete()) {
-            throw new IOException("Could not delete original file");
-        }
-        if (!tempFile.renameTo(new File(filePath))) {
-            throw new IOException("Could not rename temp file");
-        }
+    private User dataToUser(String[] tokens) {
+        User user = new User(tokens[0], tokens[1],
+                             tokens[2], tokens[3],
+                             Integer.parseInt(tokens[4]),
+                             Role.valueOf(tokens[5]));
+        return user;
+    }
+
+    //user data: 0userName,1encodePW,2firstName,3lastName,4loginCount,5role
+    private String userToData(User user) {
+        return String.format("%s, %s, %s, %s, %s, %s",
+                             user.getUserName(), user.getEncodePassword(),
+                             user.getFirstName(), user.getLastName(),
+                             user.getLoginCount(), user.getRole());
     }
 }
