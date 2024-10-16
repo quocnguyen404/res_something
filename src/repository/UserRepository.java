@@ -43,7 +43,7 @@ public class UserRepository {
     }
 
     // Save a new user to the file
-    public void saveUser(User user) throws IOException {
+    public void saveUser(User user) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(USER_DATA_PATH, true))) {
             users.put(user.getUserName(), user);
             writer.write(userToData(user));
@@ -90,7 +90,6 @@ public class UserRepository {
         } catch(IOException e) {
             e.printStackTrace();
         }
-
     }
 
     // Delete user by username

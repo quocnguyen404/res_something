@@ -1,55 +1,78 @@
 package repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.nio.file.Paths;
+
+import common.AppConstant;
+import dao.Feedback;
 
 public class FeedbackRepository {
-    private final String filePath;
+    private static final int FLFD = 3;
+    private static final String FEED_BACK_FOLDER = AppConstant.DATA_PREFIX+"feedbacks\\";
+    private Map<Integer, Feedback> feedbacks;
 
-    public FeedbackRepository(String filePath) {
-        this.filePath = filePath;
+    public FeedbackRepository() {
+        loadAllAttendanceFromFile();
     }
 
-    // Method to save feedback for an employee
-    public void saveFeedback(int employeeID, LocalDate date, String feedbackMessage) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            writer.write(employeeID + "," + date.toString() + "," + feedbackMessage);
-            writer.newLine();
-        } catch (IOException e) {
-            System.err.println("Error writing to feedback file: " + e.getMessage());
-        }
+    public List<Feedback> getFeedbacksList() {
+        return new ArrayList<Feedback>(feedbacks.values());
     }
 
-    // Method to load all feedback records
-    public List<String> loadAllFeedback() {
-        List<String> feedbackRecords = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                feedbackRecords.add(line);
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading from feedback file: " + e.getMessage());
-        }
-        return feedbackRecords;
-    }
-
-    // Method to load feedback for a specific employee by ID
-    public List<String> loadFeedbackByEmployeeID(int employeeID) {
-        List<String> records = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (Integer.parseInt(parts[0]) == employeeID) {
-                    records.add(line); // Add the feedback record for the specified employee
+    private void loadAllAttendanceFromFile() {
+        String file = FEED_BACK_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
+        Path path = Paths.get(file);
+        feedbacks = new HashMap<>();
+        try {
+            if(Files.exists(path)) {
+                try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while((line = reader.readLine()) != null) {
+                        String[] tokens = line.split(",");
+                        if(tokens.length != FLFD)
+                            throw new Exception("Attendance format wrong");
+                        Feedback feedback = dataToFeedback(tokens);
+                        feedbacks.put(feedback.getOrderID(), feedback);
+                    }
                 }
+            } else {
+                Files.createFile(path);
             }
-        } catch (IOException e) {
-            System.err.println("Error reading from feedback file: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return records; // Return all feedback records for the employee
+    }
+
+    public void saveFeedback(Feedback feedback) {
+        String file = FEED_BACK_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            feedbacks.put(feedback.getOrderID(), feedback);
+            writer.write(feedbackToData(feedback));
+            writer.newLine();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Feedback getFeedbackByOrderID(int orderID) {
+        if(feedbacks.containsKey(orderID)) {
+            return feedbacks.get(orderID);
+        }
+        return null;
+    }
+
+    private Feedback dataToFeedback(String[] tokens) {
+        return new Feedback(Integer.parseInt(tokens[0]), tokens[1], tokens[2]);
+    }
+
+    private String feedbackToData(Feedback feedback) {
+        return String.format("%s,%s,%s", feedback.getOrderID(), feedback.getCustomerName(), feedback.getFeedback());
     }
 }

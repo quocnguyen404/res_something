@@ -1,56 +1,72 @@
 package repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.nio.file.Paths;
+import java.time.LocalTime;
 
 import common.AppConstant;
+import dao.Attendance;
 
 public class AttendanceRepository {
-    private final String filePath = AppConstant.DATA_PREFIX+"attendances"+AppConstant.DATA_SUFFIX;
+    private static final int ALFD = 2;
+    private static final String ATTENDANCE_FOLDER = AppConstant.DATA_PREFIX+"attendances\\";
+    private Map<Integer, Attendance> attendances;
 
     public AttendanceRepository() {
+        loadAllAttendanceFromFile();
     }
 
-    // Method to save attendance for an employee
-    public void saveAttendance(int employeeID, LocalDate date, String status) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            writer.write(employeeID + "," + date.toString() + "," + status);
-            writer.newLine();
-        } catch (IOException e) {
-            System.err.println("Error writing to attendance file: " + e.getMessage());
-        }
+    public List<Attendance> getAttendanceList() {
+        return new ArrayList<Attendance>(attendances.values());
     }
 
-    // Method to load all attendance records
-    public List<String> loadAllAttendance() {
-        List<String> attendanceRecords = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                attendanceRecords.add(line);
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading from attendance file: " + e.getMessage());
-        }
-        return attendanceRecords;
-    }
-
-    // Method to load attendance for a specific employee by ID
-    public List<String> loadAttendanceByEmployeeID(int employeeID) {
-        List<String> records = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (Integer.parseInt(parts[0]) == employeeID) {
-                    records.add(line); // Add the attendance record for the specified employee
+    private void loadAllAttendanceFromFile() {
+        String file = ATTENDANCE_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
+        Path path = Paths.get(file);
+        attendances = new HashMap<>();
+        try {
+            if(Files.exists(path)) {
+                try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while((line = reader.readLine()) != null) {
+                        String[] tokens = line.split(",");
+                        if(tokens.length != ALFD)
+                            throw new Exception("Attendance format wrong");
+                        Attendance atten = dataToAttendance(tokens);
+                        attendances.put(atten.getId(), atten);
+                    }
                 }
+            } else {
+                Files.createFile(path);
             }
-        } catch (IOException e) {
-            System.err.println("Error reading from attendance file: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return records; // Return all attendance records for the employee
+    }
+
+    public void saveAttendance(Attendance attendance) {
+        String file = ATTENDANCE_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            attendances.put(attendance.getId(), attendance);
+            writer.write(attendaceToData(attendance));
+            writer.newLine();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Attendance dataToAttendance(String[] tokens) {
+        return new Attendance(Integer.parseInt(tokens[0]), LocalTime.parse(tokens[1]));
+    }
+
+    private String attendaceToData(Attendance atten) {
+        return String.format("%s,%s", atten.getId(), atten.getTime());
     }
 }
