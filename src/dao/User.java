@@ -14,7 +14,7 @@ public class User {
     public User() {
     }
 
-    public User(String userName, String encodePassword, String firstName, String lastName, int loginCount, Role role) {
+    public User(String userName, String encodePassword, String password, String firstName, String lastName, int loginCount, Role role) {
         this.userName = userName;
         this.encodePassword = encodePassword;
         this.firstName = firstName;

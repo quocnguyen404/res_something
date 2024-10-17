@@ -62,6 +62,13 @@ public class AttendanceRepository {
         }
     }
 
+    public Attendance findAttendanceByEmployeeID(int id) {
+        if(attendances.containsKey(id)) {
+            return attendances.get(id);
+        }
+        return null;
+    }
+
     private Attendance dataToAttendance(String[] tokens) {
         return new Attendance(Integer.parseInt(tokens[0]), LocalTime.parse(tokens[1]));
     }

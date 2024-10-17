@@ -12,7 +12,7 @@ import java.util.Map;
 import common.AppConstant;
 
 public class UserRepository {
-    private static final int ULFD = 6;
+    private static final int ULFD = 7;
     private static final String USER_DATA_PATH = AppConstant.DATA_PREFIX+"users"+AppConstant.DATA_SUFFIX;
     private static final String USER_TMP_DATA_PATH = AppConstant.DATA_PREFIX+"users"+AppConstant.DATA_TEMP_SUFFIX;
     private Map<String, User> users;
@@ -120,16 +120,18 @@ public class UserRepository {
 
     private User dataToUser(String[] tokens) {
         User user = new User(tokens[0], tokens[1],
-                             tokens[2], tokens[3],
-                             Integer.parseInt(tokens[4]),
-                             Role.valueOf(tokens[5]));
+                             tokens[2],
+                             tokens[3], tokens[4],
+                             Integer.parseInt(tokens[5]),
+                             Role.valueOf(tokens[6]));
         return user;
     }
 
-    //user data: 0userName,1encodePW,2firstName,3lastName,4loginCount,5role
+    //user data: 0userName,1encodePW,2password,3firstName,4lastName,5loginCount,6role
     private String userToData(User user) {
-        return String.format("%s, %s, %s, %s, %s, %s",
+        return String.format("%s,%s,%s,%s,%s,%s,%s",
                              user.getUserName(), user.getEncodePassword(),
+                             user.getPassword(),
                              user.getFirstName(), user.getLastName(),
                              user.getLoginCount(), user.getRole());
     }

@@ -5,8 +5,8 @@ import common.Result;
 public class Response<T> {
     private String message;
     private boolean isOK;
-    private T data;
     private Result result;
+    private T data;
 
     public Response() {
         

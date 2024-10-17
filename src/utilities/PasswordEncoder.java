@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class PasswordEncoder {
-    public String hashPassword(String password) {
+    public String encode(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashedBytes = digest.digest(password.getBytes());
@@ -13,5 +13,9 @@ public class PasswordEncoder {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error hashing password", e);
         }
+    }
+
+    public boolean matches(String encodePw, String password) {
+        return encodePw.equals(encode(password));
     }
 }
