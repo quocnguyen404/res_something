@@ -32,4 +32,15 @@ public class SystemService {
         }
         return resultExecute;
     }
+
+    public Map<Object, Object> createOrder(int orderID, Map<String,Integer> dishes) {
+        
+    }
+
+
+    public Map<Object, Object> doLogout() {
+        Map<Object, Object> resultExecute = new HashMap<>();
+
+        return resultExecute;
+    }
 }

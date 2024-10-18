@@ -52,7 +52,15 @@ public class AttendanceRepository {
     }
 
     public void saveAttendance(Attendance attendance) {
-        String file = ATTENDANCE_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
+        String fileDir = ATTENDANCE_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
+        File file = new File(fileDir);
+        if(!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             attendances.put(attendance.getId(), attendance);
             writer.write(attendaceToData(attendance));

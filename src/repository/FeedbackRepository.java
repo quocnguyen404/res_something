@@ -51,7 +51,15 @@ public class FeedbackRepository {
     }
 
     public void saveFeedback(Feedback feedback) {
-        String file = FEED_BACK_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
+        String fileDir = FEED_BACK_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
+        File file = new File(fileDir);
+        if(!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             feedbacks.put(feedback.getOrderID(), feedback);
             writer.write(feedbackToData(feedback));

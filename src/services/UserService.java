@@ -72,6 +72,4 @@ public class UserService {
         }
         return resultExecute;
     }
-
-    
 }

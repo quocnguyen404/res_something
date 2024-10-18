@@ -33,7 +33,9 @@ public class AuthService {
             boolean match = passwordEncoder.matches(user.getEncodePassword(), request.getPassword());
             if(!match) {
                 if(user.getLoginCount() == 0) {
-                    
+                    //handle user login
+                    user.setLoginCount(MAX_LOGIN_COUNT);
+                    userRepository.updateUser(user);
                 }
                 user.setLoginCount(user.getLoginCount() - 1);
                 resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
