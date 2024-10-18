@@ -1,6 +1,6 @@
 package dao;
 
-import java.time.LocalTime;;
+import java.time.LocalTime;
 
 public class Attendance {
     private int id;

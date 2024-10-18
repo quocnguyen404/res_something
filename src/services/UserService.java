@@ -29,8 +29,7 @@ public class UserService {
             if(userRepository.findUserByUserName(request.getUserName()) != null) {
                 resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
                 resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Already exist user");
-            }
-            else {
+            } else {
                 String encodePassword = passwordEncoder.encode(request.getPassword());
                 UserMapper mapper = new UserMapper();
 

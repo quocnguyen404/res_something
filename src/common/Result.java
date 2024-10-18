@@ -16,7 +16,7 @@ public class Result {
     }
 
     public static Result OK() {
-        return new Result("OK", true, "200");
+        return new Result("OK", true, null);
     }
 
     public static Result NotOK() {
