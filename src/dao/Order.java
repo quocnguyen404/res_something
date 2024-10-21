@@ -1,6 +1,5 @@
 package dao;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import java.time.LocalTime;
@@ -8,24 +7,24 @@ import java.time.LocalTime;
 public class Order {
     private int id;
     private Map<String,Integer> dishes;
+    private double price;
     private LocalTime time;
 
     public Order() {
-        id = hashCode();
-        dishes = new HashMap<>();
     }
 
-    public Order(int id, Map<String,Integer> dishes, LocalTime time) {
+    public Order(int id, Map<String,Integer> dishes, double price, LocalTime time) {
         this.id = id;
-        this.time = time;
         this.dishes = dishes;
+        this.price = price;
+        this.time = time;
     }
 
-    public int getId() {
+    public int getID() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setID(int id) {
         this.id = id;
     }
 
@@ -35,6 +34,14 @@ public class Order {
 
     public void setDishes(Map<String,Integer> dishes) {
         this.dishes = dishes;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public LocalTime getTime() {

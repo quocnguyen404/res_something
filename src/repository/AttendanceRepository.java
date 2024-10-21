@@ -1,87 +1,43 @@
 package repository;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.nio.file.Paths;
 import java.time.LocalTime;
 
 import common.AppConstant;
 import dao.Attendance;
 
-public class AttendanceRepository {
-    private static final int ALFD = 2;
-    private static final String ATTENDANCE_FOLDER = AppConstant.DATA_PREFIX+"attendances\\";
-    private Map<Integer, Attendance> attendances;
+public class AttendanceRepository extends DynamicRepository<Integer,Attendance> {
 
     public AttendanceRepository() {
-        loadAllAttendanceFromFile();
+        DLF = 3;
+        DATA_FOLDER = AppConstant.DATA_PREFIX+"attendance\\";
+        updateRepository(LocalDate.now());
     }
 
-    public List<Attendance> getAttendanceList() {
-        return new ArrayList<Attendance>(attendances.values());
+    @Override
+    protected boolean comparePrimaryKey(String token, Attendance obj) {
+        return Integer.parseInt(token) == obj.getID();
     }
-
-    private void loadAllAttendanceFromFile() {
-        String file = ATTENDANCE_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
-        Path path = Paths.get(file);
-        attendances = new HashMap<>();
-        try {
-            if(Files.exists(path)) {
-                try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    String line;
-                    while((line = reader.readLine()) != null) {
-                        String[] tokens = line.split(",");
-                        if(tokens.length != ALFD)
-                            throw new Exception("Attendance format wrong");
-                        Attendance atten = dataToAttendance(tokens);
-                        attendances.put(atten.getId(), atten);
-                    }
-                }
-            } else {
-                Files.createFile(path);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    
+    @Override
+    protected void removeObjectFromMap(Attendance obj) {
+        if(dataMap.containsKey(obj.getID())) {
+            dataMap.remove(obj.getID());
         }
     }
 
-    public void saveAttendance(Attendance attendance) {
-        String fileDir = ATTENDANCE_FOLDER+LocalDate.now()+AppConstant.DATA_SUFFIX;
-        File file = new File(fileDir);
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            attendances.put(attendance.getId(), attendance);
-            writer.write(attendaceToData(attendance));
-            writer.newLine();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+    @Override
+    protected void putObjectToMap(Attendance obj) {
+        dataMap.put(obj.getID(), obj);
     }
 
-    public Attendance findAttendanceByEmployeeID(int id) {
-        if(attendances.containsKey(id)) {
-            return attendances.get(id);
-        }
-        return null;
+    @Override
+    protected Attendance dataToObject(String[] tokens) {
+        return new Attendance(Integer.parseInt(tokens[0]), LocalTime.parse(tokens[1]), LocalTime.parse(tokens[2]))
     }
 
-    private Attendance dataToAttendance(String[] tokens) {
-        return new Attendance(Integer.parseInt(tokens[0]), LocalTime.parse(tokens[1]));
-    }
-
-    private String attendaceToData(Attendance atten) {
-        return String.format("%s,%s", atten.getId(), atten.getTime());
+    @Override
+    protected String objectToData(Attendance obj) {
+        return String.format("%s,%s,%s", obj.getID(), obj.getCheckinTime(), obj.getCheckoutTime());
     }
 }

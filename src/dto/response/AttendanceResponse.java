@@ -6,7 +6,7 @@ public class AttendanceResponse {
     private int employeeID;
     private LocalTime time;
     
-    public AuthResponse() {
+    public AttendanceResponse() {
         
     }
     

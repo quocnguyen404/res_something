@@ -1,34 +1,24 @@
 package dao;
 
 public class Dish {
-    private int id;
-    private String name;
+    private String dishName;
     private double price;
     
     public Dish() {
 
     }
 
-    public Dish(int id, String name, double price) {
-        this.id = id;
-        this.name = name;
+    public Dish(String dishName, double price) {
+        this.dishName = dishName;
         this.price = price;
     }
 
-    public int getId() {
-        return id;
+    public String getDishName() {
+        return dishName;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String dishName) {
+        this.dishName = dishName;
     }
 
     public double getPrice() {
