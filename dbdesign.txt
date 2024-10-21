@@ -2,14 +2,13 @@
 This table will store basic user details and roles (either staff or manager).
 
 Column Name	        Data Type	            Description
-user_id	INT         (PK)	                Unique ID for the user
 user_name	        VARCHAR	                Username for login
-password	        VARCHAR	                Encoded password
+encodePassword      VARCHAR                 Encoded password
+password	        VARCHAR	                Password
 first_name	        VARCHAR	                First name of the user
 last_name	        VARCHAR	                Last name of the user
+loginCount          INT                     Amount of login count before get alert
 role	            ENUM (Staff, Manager)	Role of the user
-employee_id	INT     (FK to Employees)	    Employee-specific details
-status	            VARCHAR	                Account status (active/inactive)
 
 
 2. Employee Table

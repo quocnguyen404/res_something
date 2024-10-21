@@ -111,8 +111,6 @@ public class EmployeeRepository {
         }
     }
 
-    
-
     //employee data: 0userName, 1id, 2shift, 3salary, 4workHours, 5productivity
     private Employee dataToEmployee(String[] tokens) {
         Employee em = new Employee(Integer.parseInt(tokens[1]), WorkShift.valueOf(tokens[2]),
