@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import common.AppConstant;
 import dao.Attendance;
+import utilities.AppUtilities;
 
 public class AttendanceRepository extends DynamicRepository<Integer,Attendance> {
 
@@ -33,7 +34,7 @@ public class AttendanceRepository extends DynamicRepository<Integer,Attendance> 
 
     @Override
     protected Attendance dataToObject(String[] tokens) {
-        return new Attendance(Integer.parseInt(tokens[0]), LocalTime.parse(tokens[1]), LocalTime.parse(tokens[2]))
+        return new Attendance(Integer.parseInt(tokens[0]), AppUtilities.localTimeParse(tokens[1]), AppUtilities.localTimeParse(tokens[2]));
     }
 
     @Override

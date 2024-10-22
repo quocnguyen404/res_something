@@ -1,8 +1,6 @@
 package controller;
 
 import dto.request.UserRequest;
-import dto.response.UserResponse;
-import dto.response.baseResponse.Response;
 import services.UserService;
 
 public class UserController {
@@ -12,7 +10,7 @@ public class UserController {
         this.userService = userService;
     }
     
-    public Response<UserResponse> register(UserRequest request) {
-        return userService.register(request);
+    public void register(UserRequest request) {
+        // return userService.register(request);
     }
 }

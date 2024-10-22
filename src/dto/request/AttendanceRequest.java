@@ -1,33 +1,24 @@
 package dto.request;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class AttendanceRequest {
-    private int employeeID;
-    private LocalDate date;
+    private int id;
     private LocalTime time;
 
     public AttendanceRequest() {
     }
 
-    public AttendanceRequest(int employeeID, LocalDate date, LocalTime time) {
-        this.employeeID = employeeID;
-        this.date = date;
+    public AttendanceRequest(int id, LocalTime time) {
+        this.id = id;
         this.time = time;
     }
 
-    public int getEmployeeID() {
-        return employeeID;
+    public int getID() {
+        return id;
     }
-    public void setEmployeeID(int employeeID) {
-        this.employeeID = employeeID;
-    }
-    public LocalDate getDate() {
-        return date;
-    }
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setID(int id) {
+        this.id = id;
     }
     public LocalTime getTime() {
         return time;

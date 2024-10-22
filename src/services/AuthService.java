@@ -24,7 +24,7 @@ public class AuthService {
 
     public Map<Object, Object> doLogin(AuthRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
-        User user = userRepository.findUserByUserName(request.getUserName());
+        User user = userRepository.findObjectByKey(request.getUserName());
         
         if(user == null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
@@ -35,7 +35,7 @@ public class AuthService {
                 if(user.getLoginCount() == 0) {
                     //handle user login
                     user.setLoginCount(MAX_LOGIN_COUNT);
-                    userRepository.updateUser(user);
+                    userRepository.updateObject(user);
                 }
                 user.setLoginCount(user.getLoginCount() - 1);
                 resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());

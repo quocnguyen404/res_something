@@ -6,7 +6,6 @@ public class Result {
     private boolean isOK;
 
     public Result() {
-
     }
     
     public Result(String message, boolean isOK, String code) {
@@ -21,5 +20,29 @@ public class Result {
 
     public static Result NotOK() {
         return new Result("Not OK", false, null);
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public boolean isOK() {
+        return isOK;
+    }
+
+    public void setOK(boolean isOK) {
+        this.isOK = isOK;
     }
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import common.AppConstant;
 import dao.Order;
+import utilities.AppUtilities;
 
 public class OrderRepository extends DynamicRepository<Integer,Order> {
 
@@ -35,7 +36,7 @@ public class OrderRepository extends DynamicRepository<Integer,Order> {
 
     @Override
     protected Order dataToObject(String[] tokens) {
-        return new Order(Integer.parseInt(tokens[0]), stringToMap(tokens[1]), Double.parseDouble(tokens[2]), LocalTime.parse(tokens[3]));
+        return new Order(Integer.parseInt(tokens[0]), stringToMap(tokens[1]), Double.parseDouble(tokens[2]), AppUtilities.localTimeParse(tokens[3]));
     }
 
     @Override
