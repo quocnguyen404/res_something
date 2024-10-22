@@ -18,6 +18,18 @@ public class UserMapper {
         return user;
     }
 
+    public User toUser(UserResponse userResponse) {
+        User user = new User();
+        user.setUserName(userResponse.getUserName());
+        user.setEncodePassword(userResponse.getEncodePassword());
+        user.setPassword(userResponse.getPassword());
+        user.setFirstName(userResponse.getPassword());
+        user.setFirstName(userResponse.getFirstName());
+        user.setLastName(userResponse.getLastName());
+        user.setRole(userResponse.getRole());
+        return user;
+    }
+
     public UserResponse toResponse(User user) {
         UserResponse userResponse = new UserResponse();
         userResponse.setUserName(user.getUserName());

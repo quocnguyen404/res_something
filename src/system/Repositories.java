@@ -1,6 +1,5 @@
 package system;
 
-import dao.Role;
 import repository.AttendanceRepository;
 import repository.DishRepository;
 import repository.EmployeeRepository;
@@ -18,12 +17,7 @@ class Repositories {
     private OrderRepository orderRepository;
     // private final StatisticsRepository statisticsRepository;
 
-    Repositories(Role role) {
-        //TODO: if different role do different things
-        
-    }
-
-    public void Initialize() {
+    Repositories() {
         userRepository = new UserRepository();
         employeeRepository = new EmployeeRepository();
         dishRepository = new DishRepository();
@@ -32,7 +26,6 @@ class Repositories {
         orderRepository = new OrderRepository();
         // statisticsRepository = new StatisticsRepository();
     }
-
 
     public UserRepository getUserRepository() {
         return userRepository;
@@ -61,8 +54,4 @@ class Repositories {
     // public StatisticsRepository getStatisticsRepository() {
     //     return statisticsRepository;
     // }
-
-    public void Finialize() {
-
-    }
 }
