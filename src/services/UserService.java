@@ -37,6 +37,7 @@ public class UserService {
                 
                 resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
                 resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Success register");
+                resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,6 +65,7 @@ public class UserService {
                 userRepository.updateObject(currentUser);
                 resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
                 resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Change password success");
+                resultExecute.put(AppConstant.RESPONSE_KEY.DATA, new UserMapper().toResponse(currentUser));
             }
         } catch(Exception e) {
             e.printStackTrace();

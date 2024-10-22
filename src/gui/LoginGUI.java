@@ -2,13 +2,14 @@ package gui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LoginGUI extends JFrame {
     public final static String APP_NAME = "Login App";
     public final static int[] FRAME_SIZE = {400, 400};
     public static final int TEXTFIELD_SIZE = 15;
+
+    public ActionListener onClickLoginButton;
 
     public LoginGUI() {
         super(APP_NAME);
@@ -59,19 +60,7 @@ public class LoginGUI extends JFrame {
         loginButton.setFont(new Font("Dialog", Font.BOLD, 18));
         springLayout.putConstraint(SpringLayout.WEST, loginButton, 150, SpringLayout.WEST, loginPanel);
         springLayout.putConstraint(SpringLayout.NORTH, loginButton, 250, SpringLayout.NORTH, loginPanel);
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = String.valueOf(passwordField.getPassword());
-
-                if(username.equals("username") && password.equals("password")){
-                    System.out.println("LOGIN SUCCESSFUL!");
-                }else{
-                    System.out.println("LOGIN FAILED...");
-                }
-            }
-        });
+        loginButton.addActionListener(onClickLoginButton);
 
         loginPanel.add(loginButton);
 

@@ -7,14 +7,12 @@ import mapper.OrderMapper;
 import repository.AttendanceRepository;
 import repository.OrderRepository;
 
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
 import common.AppConstant;
 import common.Result;
 import dao.Attendance;
-import dao.Order;
 
 public class SystemService {
     private final AttendanceRepository attendanceRepository;
@@ -68,7 +66,7 @@ public class SystemService {
 
     public Map<Object, Object> doLogout() {
         Map<Object, Object> resultExecute = new HashMap<>();
-
+        //TODO do checkout or something like that
         return resultExecute;
     }
 }
