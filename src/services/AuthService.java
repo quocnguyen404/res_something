@@ -3,6 +3,7 @@ package services;
 import repository.UserRepository;
 import utilities.PasswordEncoder;
 import dto.request.AuthRequest;
+import dto.response.ResponseWrapper;
 import mapper.UserMapper;
 import common.AppConstant;
 import common.Result;
@@ -22,7 +23,7 @@ public class AuthService {
         passwordEncoder = new PasswordEncoder();
     }
 
-    public Map<Object, Object> doLogin(AuthRequest request) {
+    public ResponseWrapper doLogin(AuthRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
         User user = userRepository.findObjectByKey(request.getUserName());
         
@@ -46,6 +47,6 @@ public class AuthService {
                 resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
             }
         }
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 }

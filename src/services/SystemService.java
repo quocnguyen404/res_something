@@ -2,6 +2,7 @@ package services;
 
 import dto.request.AttendanceRequest;
 import dto.request.OrderRequest;
+import dto.response.ResponseWrapper;
 import mapper.AttendanceMapper;
 import mapper.OrderMapper;
 import repository.AttendanceRepository;
@@ -23,7 +24,7 @@ public class SystemService {
         this.orderRepository = orderRepository;
     }
 
-    public Map<Object, Object> checkAttendance(AttendanceRequest request) {
+    public ResponseWrapper checkAttendance(AttendanceRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
         AttendanceMapper mapper = new AttendanceMapper();
         Attendance attendance = attendanceRepository.findObjectByKey(request.getID());
@@ -36,7 +37,7 @@ public class SystemService {
                 resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Check out success");
                 resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(attendance));
             }
-            return resultExecute;
+            return new ResponseWrapper(resultExecute);
         }
 
         attendance = mapper.toAttendanceCheckin(request);
@@ -44,16 +45,16 @@ public class SystemService {
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Check in success");
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(attendance));
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 
-    public Map<Object, Object> createOrder(OrderRequest request) {
+    public ResponseWrapper createOrder(OrderRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
 
         if(orderRepository.findObjectByKey(request.getID()) != null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Already exist order id");
-            return resultExecute;
+            return new ResponseWrapper(resultExecute);
         }
 
         OrderMapper mapper = new OrderMapper();
@@ -61,12 +62,12 @@ public class SystemService {
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Create order success");
 
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 
-    public Map<Object, Object> doLogout() {
+    public ResponseWrapper doLogout() {
         Map<Object, Object> resultExecute = new HashMap<>();
         //TODO do checkout or something like that
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 }

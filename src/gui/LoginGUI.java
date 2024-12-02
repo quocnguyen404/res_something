@@ -1,77 +1,62 @@
+
 package gui;
 
-import javax.swing.*;
+import listener.Event;
+import listener.Listener;
+import system.EventDispatcher;
+import dto.response.UserResponse;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
-import listener.LoginListener;
+public class LoginGUI extends Application {
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Login application.App");
 
-public class LoginGUI extends JFrame {
-    public final static String APP_NAME = "Login App";
-    public final static int[] FRAME_SIZE = {400, 400};
-    public static final int TEXTFIELD_SIZE = 15;
-    public LoginListener loginListener;
+        // Set up grid layout
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(10, 10, 10, 10));
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
 
-    public LoginGUI() {
-        super(APP_NAME);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(FRAME_SIZE[0], FRAME_SIZE[1]);
-        setLocationRelativeTo(null);
+        // Add login form components
+        Label userLabel = new Label("Username:");
+        TextField userTextField = new TextField();
+        Label passLabel = new Label("Password:");
+        PasswordField passwordField = new PasswordField();
+        Button loginButton = new Button("Login");
 
-        addGUIComponents();
-    }
+        gridPane.add(userLabel, 0, 0);
+        gridPane.add(userTextField, 1, 0);
+        gridPane.add(passLabel, 0, 1);
+        gridPane.add(passwordField, 1, 1);
+        gridPane.add(loginButton, 1, 2);
 
-    public void addGUIComponents(){
-        SpringLayout springLayout = new SpringLayout();
-        JPanel loginPanel = new JPanel();
-        loginPanel.setLayout(springLayout);
+        loginButton.setOnAction(event -> {
+            String username = userTextField.getText();
+            String password = passwordField.getText();
 
-        // username
-        JLabel usernameLabel = new JLabel("Username: ");
-        usernameLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
-
-        JTextField usernameField = new JTextField(TEXTFIELD_SIZE);
-        usernameField.setFont(new Font("Dialog", Font.PLAIN, 18));
-
-        springLayout.putConstraint(SpringLayout.WEST, usernameLabel, 35, SpringLayout.WEST, loginPanel);
-        springLayout.putConstraint(SpringLayout.NORTH, usernameLabel, 85, SpringLayout.NORTH, loginPanel);
-        springLayout.putConstraint(SpringLayout.WEST, usernameField, 135, SpringLayout.WEST, loginPanel);
-        springLayout.putConstraint(SpringLayout.NORTH, usernameField, 85, SpringLayout.NORTH, loginPanel);
-
-        loginPanel.add(usernameLabel);
-        loginPanel.add(usernameField);
-
-        // password
-        JLabel passwordLabel = new JLabel("Password: ");
-        passwordLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
-
-        JPasswordField passwordField = new JPasswordField(TEXTFIELD_SIZE);
-        passwordField.setFont(new Font("Dialog", Font.PLAIN, 18));
-
-        springLayout.putConstraint(SpringLayout.WEST, passwordLabel, 35, SpringLayout.WEST, loginPanel);
-        springLayout.putConstraint(SpringLayout.NORTH, passwordLabel, 135, SpringLayout.NORTH, loginPanel);
-        springLayout.putConstraint(SpringLayout.WEST, passwordField, 135, SpringLayout.WEST, loginPanel);
-        springLayout.putConstraint(SpringLayout.NORTH, passwordField, 135, SpringLayout.NORTH, loginPanel);
-
-        loginPanel.add(passwordLabel);
-        loginPanel.add(passwordField);
-
-        // login button
-        JButton loginButton = new JButton("Login");
-        loginButton.setFont(new Font("Dialog", Font.BOLD, 18));
-        springLayout.putConstraint(SpringLayout.WEST, loginButton, 150, SpringLayout.WEST, loginPanel);
-        springLayout.putConstraint(SpringLayout.NORTH, loginButton, 250, SpringLayout.NORTH, loginPanel);
-
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loginListener.invoke(usernameField.getText(), passwordField.getPassword().toString());
-            }
+            EventDispatcher.invoke(Event.Login, username, password);
+            Listener lis = EventDispatcher.getEvent(Event.Login);
+            UserResponse user = (UserResponse)lis.getResponse().getData();
+            System.out.println(lis.getResponse().isOK());
+            System.out.println(user);
         });
 
-        loginPanel.add(loginButton);
-        this.getContentPane().add(loginPanel);
+        Scene scene = new Scene(gridPane, 300, 200);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void showAlert(String title, String content, Alert.AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

@@ -5,6 +5,7 @@ import common.Result;
 import dao.User;
 import dto.request.UserChangePasswordRequest;
 import dto.request.UserRequest;
+import dto.response.ResponseWrapper;
 import mapper.UserMapper;
 import repository.UserRepository;
 import utilities.PasswordEncoder;
@@ -21,7 +22,7 @@ public class UserService {
         passwordEncoder = new PasswordEncoder();
     }
 
-    public Map<Object, Object> register(UserRequest request) {
+    public ResponseWrapper register(UserRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
         try {
             if(userRepository.findObjectByKey(request.getUserName()) != null) {
@@ -42,10 +43,10 @@ public class UserService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 
-    public Map<Object, Object> changePassword(UserChangePasswordRequest request, User currentUser) {
+    public ResponseWrapper changePassword(UserChangePasswordRequest request, User currentUser) {
         Map<Object, Object> resultExecute = new HashMap<>();
 
         try {
@@ -70,6 +71,6 @@ public class UserService {
         } catch(Exception e) {
             e.printStackTrace();
         }
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 }

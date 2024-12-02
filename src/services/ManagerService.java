@@ -13,6 +13,7 @@ import dao.Dish;
 import dao.User;
 import dto.request.DishRequest;
 import dto.request.UserRequest;
+import dto.response.ResponseWrapper;
 import mapper.DishMapper;
 import mapper.UserMapper;
 
@@ -28,13 +29,13 @@ public class ManagerService {
     }
 
     //User management
-    public Map<Object, Object> createUser(UserRequest request) {
+    public ResponseWrapper createUser(UserRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
         
         if(userRepository.findObjectByKey(request.getUserName()) != null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Adready exist user");
-            return resultExecute;
+            return new ResponseWrapper(resultExecute);
         }
         String encodePassword = passwordEncoder.encode(request.getPassword());
         UserMapper mapper = new UserMapper();
@@ -46,16 +47,16 @@ public class ManagerService {
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Create user success");
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 
-    public Map<Object, Object> updateUser(UserRequest request) {
+    public ResponseWrapper updateUser(UserRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
 
         if(userRepository.findObjectByKey(request.getUserName()) == null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist user");
-            return resultExecute;
+            return new ResponseWrapper(resultExecute);
         }
 
         UserMapper mapper = new UserMapper();
@@ -64,16 +65,17 @@ public class ManagerService {
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Update user success");
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
+
     }
 
-    public Map<Object, Object> deleteUser(UserRequest request) {
+    public ResponseWrapper deleteUser(UserRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
 
         if(userRepository.findObjectByKey(request.getUserName()) == null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist user");
-            return resultExecute;
+            return new ResponseWrapper(resultExecute);
         }
 
         UserMapper mapper = new UserMapper();
@@ -82,17 +84,17 @@ public class ManagerService {
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Delete user success");
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 
     //Dish management
-    public Map<Object, Object> addDish(DishRequest request) {
+    public ResponseWrapper addDish(DishRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
 
         if(dishRepository.findObjectByKey(request.getDishName()) != null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Already exist dish");
-            return resultExecute;
+            return new ResponseWrapper(resultExecute);
         }
 
         DishMapper mapper = new DishMapper();
@@ -102,16 +104,16 @@ public class ManagerService {
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Add dish success");
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(dish));
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 
-    public Map<Object, Object> updateDish(DishRequest request) {
+    public ResponseWrapper updateDish(DishRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
         
         if(dishRepository.findObjectByKey(request.getDishName()) == null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist dish");
-            return resultExecute;
+            return new ResponseWrapper(resultExecute);
         }
 
         DishMapper mapper = new DishMapper();
@@ -122,16 +124,16 @@ public class ManagerService {
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Update dish success");
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(dish));
 
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 
-    public Map<Object,Object> deleteDish(DishRequest request) {
+    public ResponseWrapper deleteDish(DishRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
 
         if(dishRepository.findObjectByKey(request.getDishName()) == null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist dish");
-            return resultExecute;
+            return new ResponseWrapper(resultExecute);
         }
 
         DishMapper mapper = new DishMapper();
@@ -142,6 +144,6 @@ public class ManagerService {
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Delete dish success");
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(dish));
 
-        return resultExecute;
+        return new ResponseWrapper(resultExecute);
     }
 }
