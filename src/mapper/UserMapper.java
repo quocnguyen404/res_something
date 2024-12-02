@@ -9,9 +9,8 @@ public class UserMapper {
     public User toUser(UserRequest userRequest) {
         User user = new User();
         user.setUserName(userRequest.getUserName());
-        user.setEncodePassword(userRequest.getEncodePassword());
+        // user.setEncodePassword(userRequest.getEncodePassword());
         user.setPassword(userRequest.getPassword());
-        user.setFirstName(userRequest.getPassword());
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
         user.setRole(userRequest.getRole());
@@ -23,7 +22,6 @@ public class UserMapper {
         user.setUserName(userResponse.getUserName());
         user.setEncodePassword(userResponse.getEncodePassword());
         user.setPassword(userResponse.getPassword());
-        user.setFirstName(userResponse.getPassword());
         user.setFirstName(userResponse.getFirstName());
         user.setLastName(userResponse.getLastName());
         user.setRole(userResponse.getRole());
@@ -35,7 +33,6 @@ public class UserMapper {
         userResponse.setUserName(user.getUserName());
         userResponse.setEncodePassword(user.getEncodePassword());
         userResponse.setPassword(user.getPassword());
-        userResponse.setFirstName(user.getPassword());
         userResponse.setFirstName(user.getFirstName());
         userResponse.setLastName(user.getLastName());
         userResponse.setRole(user.getRole());

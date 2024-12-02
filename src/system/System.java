@@ -1,6 +1,7 @@
 package system;
 
 import javafx.stage.Stage;
+import dao.Role;
 import dto.request.UserRequest;
 import javafx.application.Application;
 
@@ -14,8 +15,8 @@ public class System extends Application{
         ui = new UI();
         repositories = new Repositories();
         services = new Services(repositories);
-
-
+        
+        preRun();
         ui.bindEvent(services);
     }
 
@@ -26,6 +27,12 @@ public class System extends Application{
 
     private void preRun() {
         //add manager
-        services.getManagerService().createUser(new UserRequest());
+        UserRequest admin = new UserRequest();
+        admin.setUserName("admin");
+        admin.setPassword("admin123");
+        admin.setFirstName("admin");
+        admin.setLastName("admin");
+        admin.setRole(Role.MANAGER);
+        services.getDevService().addAdministrator(admin);
     }
 }

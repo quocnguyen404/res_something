@@ -15,11 +15,11 @@ public class Result {
     }
 
     public static Result OK() {
-        return new Result("OK", true, null);
+        return AppConstant.OK_RESULT;
     }
 
     public static Result NotOK() {
-        return new Result("Not OK", false, null);
+        return AppConstant.NOT_OK_RESULT;
     }
 
     public String getMessage() {

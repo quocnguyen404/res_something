@@ -45,6 +45,7 @@ public class AuthService {
                 UserMapper mapper = new UserMapper();
                 resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
                 resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
+                resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Success login");
             }
         }
         return new ResponseWrapper(resultExecute);

@@ -2,6 +2,7 @@ package services;
 
 import dao.User;
 import dto.request.UserRequest;
+import mapper.UserMapper;
 import repository.DishRepository;
 import repository.UserRepository;
 import utilities.PasswordEncoder;
@@ -17,16 +18,21 @@ public class DevService {
         passwordEncoder = new PasswordEncoder();
     }
 
-    public void addAdministrator(UserRequest userRequest) {
-        if(userRepository.findObjectByKey(userRequest.getUserName()) != null) {
+    public void addAdministrator(UserRequest request) {
+        if(userRepository.findObjectByKey(request.getUserName()) != null) {
             System.out.println("Already exist userName");
             return;
         }
 
-        
+        String encodePassword = passwordEncoder.encode(request.getPassword());
+        UserMapper mapper = new UserMapper();
+
+        User user = mapper.toUser(request);
+        user.setEncodePassword(encodePassword);
+        userRepository.saveObject(user);
     }
 
-    public void removeAdministrator(UserRequest userRequest) {
+    public void removeAdministrator(UserRequest request) {
 
     }
 }

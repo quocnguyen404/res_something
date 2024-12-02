@@ -3,6 +3,7 @@ package dto.response;
 import java.util.Map;
 
 import common.AppConstant;
+import common.Result;
 
 public class ResponseWrapper {
     private Map<Object,Object> response;
@@ -15,7 +16,7 @@ public class ResponseWrapper {
     }
 
     public Boolean isOK() {
-        return response.get(AppConstant.RESPONSE_KEY.RESULT).equals(AppConstant.OK_RESULT);
+        return response.get(AppConstant.RESPONSE_KEY.RESULT).equals(Result.OK());
     }
     
     public Object getData() {

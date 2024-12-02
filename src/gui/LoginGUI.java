@@ -44,6 +44,8 @@ public class LoginGUI extends Application {
             EventDispatcher.invoke(Event.Login, username, password);
             Listener lis = EventDispatcher.getEvent(Event.Login);
             UserResponse user = (UserResponse)lis.getResponse().getData();
+            
+            System.out.println(lis.getResponse().getMessage());
             System.out.println(lis.getResponse().isOK());
             System.out.println(user);
         });

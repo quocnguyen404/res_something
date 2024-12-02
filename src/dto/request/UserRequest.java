@@ -3,7 +3,6 @@ package dto.request;
 
 public class UserRequest {
     private String userName;
-    private String encodePassword;
     private String password;
     private String firstName;
     private String lastName;
@@ -14,12 +13,6 @@ public class UserRequest {
     }
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-    public String getEncodePassword() {
-        return encodePassword;
-    }
-    public void setEncodePassword(String encodePassword) {
-        this.encodePassword = encodePassword;
     }
     
     public String getPassword() {
