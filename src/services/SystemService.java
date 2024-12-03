@@ -54,7 +54,8 @@ public class SystemService {
 
     public ResponseWrapper createOrder() {
         Map<Object, Object> resultExecute = new HashMap<>();
-        CreateOrderResponse response = new CreateOrderResponse(dishRepository.getDataList());
+        OrderRequest orderRequest = new OrderRequest();
+        CreateOrderResponse response = new CreateOrderResponse(dishRepository.getDataList(), orderRequest);
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, response);
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Get dishes success");

@@ -1,6 +1,5 @@
 package system;
 
-import common.Result;
 import dto.response.ResponseWrapper;
 import dto.response.UserResponse;
 import gui.*;
@@ -11,10 +10,14 @@ import listener.*;
 public class UI {
     private Stage arg0;
     private SystemUser user;
+
     private LoginGUI loginGUI;
+    private ManagerManagementGUI managementGUI;
+    private EmployeeManagementGUI employeeManagementGUI;
 
     public UI() {
         loginGUI = new LoginGUI();
+        bindEvent();
     }
 
     public void start(Stage arg0) {
@@ -22,30 +25,19 @@ public class UI {
         loginGUI.start(arg0);
     }
 
-    private void login(String userName, String password) {
-
+    private void bindEvent() {
+        ActionListener handleLogin = new ActionListener(this::handleLogin);
+        EventDispatcher.addEvent(Event.HandleLogin, handleLogin);
     }
-
-    private void managerLogin(ResponseWrapper response) {
-        try {
-            user = (SystemUser)response.getData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void employeeLogin(ResponseWrapper response) {
-
-    }
-
+    
     private void handleLogin() {
-        Listener listener = EventDispatcher.getListener(Event.Login);
+        Listener listener = EventDispatcher.getListener(Event.Authenticate);
         ResponseWrapper loginResponse = listener.getResponse();
         try {
             if(loginResponse.isOK()) {
                 handleLoginSuccess(loginResponse);
             } else {
-                UIUtilities.showAlert(null, loginResponse.getMessage(), AlertType.INFORMATION);
+                UIUtilities.showAlert("Alert", loginResponse.getMessage(), AlertType.INFORMATION);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -54,14 +46,26 @@ public class UI {
     }
 
     private void handleLoginSuccess(ResponseWrapper response) {
-        UserResponse user = (UserResponse)response.getData();
-        // Debug.printObject(userResponse);
-        ResponseWrapper newResponse = new ResponseWrapper(Result.OK(), new SystemUser(user), response.getMessage());
+        UserResponse userResponse = (UserResponse)response.getData();
+        user = new SystemUser(userResponse);
+
+        try {
+            loginGUI.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         switch (user.getRole()) {
             case MANAGER: {
+                managementGUI = new ManagerManagementGUI();
+                EventDispatcher.invoke(Event.BindManagerEvent, userResponse);
+                managementGUI.start(arg0);
             } break;
-
+            
             case STAFF: {
+                employeeManagementGUI = new EmployeeManagementGUI();
+                EventDispatcher.invoke(Event.BindEmployeeEvent, userResponse);
+                employeeManagementGUI.start(arg0);
             } break;
         }
     }

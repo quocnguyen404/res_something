@@ -6,4 +6,8 @@ public enum Event {
     CreateOrder,
     SubmitOrder,
     Logout,
+
+    HandleLogin,
+    BindManagerEvent,
+    BindEmployeeEvent,
 }

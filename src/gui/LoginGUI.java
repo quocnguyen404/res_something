@@ -4,7 +4,7 @@ package gui;
 import listener.Event;
 import system.EventDispatcher;
 import debug.Debug;
-
+import dto.request.AuthRequest;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -40,9 +40,10 @@ public class LoginGUI extends Application {
         loginButton.setOnAction(event -> {
             String username = userTextField.getText();
             String password = passwordField.getText();
-
-            EventDispatcher.invoke(Event.Login, username, password);
-            // Debug.printResponse(Event.Login);
+            AuthRequest authRequest = new AuthRequest(username, password);
+            EventDispatcher.invoke(Event.Authenticate, authRequest);
+            EventDispatcher.invoke(Event.HandleLogin);
+        
         });
 
         Scene scene = new Scene(gridPane, 300, 200);

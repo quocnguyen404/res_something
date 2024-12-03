@@ -1,11 +1,13 @@
 package system;
 
+import listener.ActionListener;
+import listener.ConsumerListener;
 import listener.Event;
 import listener.NonRequestListener;
 import listener.ServiceListener;
 import dao.Role;
 import dto.request.*;
-
+import dto.response.UserResponse;
 import javafx.stage.Stage;
 import javafx.application.Application;
 
@@ -21,7 +23,7 @@ public class System extends Application{
         services = new Services(repositories);
         
         preRun();
-        bindEvent();
+        bindSystemEvent();
     }
 
     @Override
@@ -40,7 +42,7 @@ public class System extends Application{
         services.getDevService().addAdministrator(admin);
     }
 
-    private void bindEvent() {
+    private void bindSystemEvent() {
         //system service
         ServiceListener<AuthRequest> authenticateListener = new ServiceListener<>(services.getAuthService()::doLogin);
         EventDispatcher.addEvent(Event.Authenticate, authenticateListener);
@@ -56,9 +58,39 @@ public class System extends Application{
 
         NonRequestListener logoutListener = new NonRequestListener(services.getSystemService()::doLogout);
         EventDispatcher.addEvent(Event.Logout, logoutListener);
+
+        ConsumerListener<UserResponse> bindManagerListener = new ConsumerListener<>(this::bindManagerEvent);
+        EventDispatcher.addEvent(Event.BindManagerEvent, bindManagerListener);
+    
+        ConsumerListener<UserResponse> bindEmployeeListener = new ConsumerListener<>(this::BindEmployeeEvent);
+        EventDispatcher.addEvent(Event.BindEmployeeEvent, bindEmployeeListener);
     }
 
-    private void bindManagerEvent() {
+    private void bindManagerEvent(UserResponse user) {
+        try {
+            if(user.getRole() != Role.MANAGER) {
+                throw new Exception("Do not permission to access services");
+            }
+        } catch (Exception e) {
+            //TODO show alert do login again
+            e.printStackTrace();
+            return;
+        }
 
+        //TODO bind manager services
+    }
+
+    private void BindEmployeeEvent(UserResponse user) {
+        try {
+            if(user.getRole() != Role.STAFF) {
+                throw new Exception("Do not permission to access services");
+            }
+        } catch (Exception e) {
+            // TODO show alert do login again
+            e.printStackTrace();
+            return;
+        }
+
+        //TODO bind manager services
     }
 }
