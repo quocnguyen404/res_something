@@ -2,9 +2,9 @@
 package gui;
 
 import listener.Event;
-import listener.Listener;
 import system.EventDispatcher;
-import dto.response.UserResponse;
+import debug.Debug;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -42,12 +42,7 @@ public class LoginGUI extends Application {
             String password = passwordField.getText();
 
             EventDispatcher.invoke(Event.Login, username, password);
-            Listener lis = EventDispatcher.getEvent(Event.Login);
-            UserResponse user = (UserResponse)lis.getResponse().getData();
-            
-            System.out.println(lis.getResponse().getMessage());
-            System.out.println(lis.getResponse().isOK());
-            System.out.println(user);
+            // Debug.printResponse(Event.Login);
         });
 
         Scene scene = new Scene(gridPane, 300, 200);
@@ -55,10 +50,5 @@ public class LoginGUI extends Application {
         primaryStage.show();
     }
 
-    private void showAlert(String title, String content, Alert.AlertType alertType) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
+
 }

@@ -2,10 +2,12 @@ package services;
 
 import dto.request.AttendanceRequest;
 import dto.request.OrderRequest;
+import dto.response.CreateOrderResponse;
 import dto.response.ResponseWrapper;
 import mapper.AttendanceMapper;
 import mapper.OrderMapper;
 import repository.AttendanceRepository;
+import repository.DishRepository;
 import repository.OrderRepository;
 
 import java.util.HashMap;
@@ -18,10 +20,12 @@ import dao.Attendance;
 public class SystemService {
     private final AttendanceRepository attendanceRepository;
     private final OrderRepository orderRepository;
+    private final DishRepository dishRepository;
 
-    public SystemService(AttendanceRepository attendanceRepository, OrderRepository orderRepository) {
+    public SystemService(AttendanceRepository attendanceRepository, OrderRepository orderRepository, DishRepository dishRepository) {
         this.attendanceRepository = attendanceRepository;
         this.orderRepository = orderRepository;
+        this.dishRepository = dishRepository;
     }
 
     public ResponseWrapper checkAttendance(AttendanceRequest request) {
@@ -48,7 +52,16 @@ public class SystemService {
         return new ResponseWrapper(resultExecute);
     }
 
-    public ResponseWrapper createOrder(OrderRequest request) {
+    public ResponseWrapper createOrder() {
+        Map<Object, Object> resultExecute = new HashMap<>();
+        CreateOrderResponse response = new CreateOrderResponse(dishRepository.getDataList());
+        resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, response);
+        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Get dishes success");
+        return new ResponseWrapper(resultExecute);
+    }
+
+    public ResponseWrapper submitOrder(OrderRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
 
         if(orderRepository.findObjectByKey(request.getID()) != null) {

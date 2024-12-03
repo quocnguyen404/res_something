@@ -16,7 +16,7 @@ class Services {
     Services(Repositories repositories) {
         authService = new AuthService(repositories.getUserRepository());
         managerService = new ManagerService(repositories.getUserRepository(), repositories.getDishRepository());
-        systemService = new SystemService(repositories.getAttendanceRepository(), repositories.getOrderRepository());
+        systemService = new SystemService(repositories.getAttendanceRepository(), repositories.getOrderRepository(), repositories.getDishRepository());
         userService = new UserService(repositories.getUserRepository());
         devService = new DevService(repositories.getUserRepository(), repositories.getDishRepository());
     }

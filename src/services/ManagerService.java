@@ -50,6 +50,8 @@ public class ManagerService {
         return new ResponseWrapper(resultExecute);
     }
 
+    //TODO create employee with exist user -> encode userName to id
+
     public ResponseWrapper updateUser(UserRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
 

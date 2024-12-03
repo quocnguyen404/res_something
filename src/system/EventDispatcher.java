@@ -11,24 +11,23 @@ public class EventDispatcher {
     private static Map<Event, Listener> dispatcher = new HashMap<>();
 
     // If event already exist, replace old listener with the new one
-    public static void addEvent(Event event, Listener listener) {
+    static void addEvent(Event event, Listener listener) {
         dispatcher.put(event, listener);
     }
 
-    public static void removeEvent(Event event) {
+    static void removeEvent(Event event) {
         try {
             if(dispatcher.containsKey(event)) {
                 dispatcher.remove(event);
             } else {
                 throw new Exception(String.format("Not exist event [%s] to remove", event.toString()));
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static Listener getEvent(Event event) {
+    public final static Listener getListener(Event event) {
         return dispatcher.get(event);
     }
 
@@ -46,9 +45,5 @@ public class EventDispatcher {
 
     public static <T, T1, T2> void invoke(Event event, T d, T1 d1, T2 d2) {
         dispatcher.get(event).invoke(d, d1, d2);
-    }
-
-    public static <T, T1, T2, T3> void invoke(Event event, T d, T1 d1, T2 d2, T3 d3) {
-        dispatcher.get(event).invoke(d, d1, d2, d3);
     }
 }

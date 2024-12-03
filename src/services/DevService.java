@@ -18,9 +18,10 @@ public class DevService {
         passwordEncoder = new PasswordEncoder();
     }
 
+    //TODO implement some dev services
     public void addAdministrator(UserRequest request) {
         if(userRepository.findObjectByKey(request.getUserName()) != null) {
-            System.out.println("Already exist userName");
+            // System.out.println("Already exist userName");
             return;
         }
 
@@ -33,6 +34,5 @@ public class DevService {
     }
 
     public void removeAdministrator(UserRequest request) {
-
     }
 }

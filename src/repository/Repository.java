@@ -68,6 +68,8 @@ public abstract class Repository<T,T1> {
                 }
                 writer.newLine();
             }
+            reader.close();
+            writer.close();
 
             // Delete the original file and rename the temp file
             if (!new File(DATA_PATH).delete()) {

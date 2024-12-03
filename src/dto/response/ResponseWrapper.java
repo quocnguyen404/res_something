@@ -1,5 +1,6 @@
 package dto.response;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import common.AppConstant;
@@ -11,6 +12,13 @@ public class ResponseWrapper {
     public ResponseWrapper() {
     }
 
+    public ResponseWrapper(Result result, Object data, String message) {
+        response = new HashMap<Object, Object>();
+        response.put(AppConstant.RESPONSE_KEY.RESULT, result);
+        response.put(AppConstant.RESPONSE_KEY.DATA, data);
+        response.put(AppConstant.RESPONSE_KEY.MESSAGE, message);
+    }
+
     public ResponseWrapper(Map<Object,Object> response) {
         this.response = response;
     }
@@ -19,7 +27,7 @@ public class ResponseWrapper {
         return response.get(AppConstant.RESPONSE_KEY.RESULT).equals(Result.OK());
     }
     
-    public Object getData() {
+    public final Object getData() {
         return response.get(AppConstant.RESPONSE_KEY.DATA);
     }
 

@@ -3,7 +3,7 @@ package system;
 import dao.Role;
 import dto.response.UserResponse;
 
-public class SystemUser {
+class SystemUser {
     private UserResponse userData;
 
     public SystemUser(UserResponse userResponse) {
@@ -14,8 +14,16 @@ public class SystemUser {
         return userData.getFirstName();
     }
 
+    public void setFirstName(String firstName) {
+        userData.setFirstName(firstName);
+    }
+
     public String getLastName() {
         return userData.getLastName();
+    }
+
+    public void setLastName(String lastName) {
+        userData.setLastName(lastName);
     }
 
     public String getFullName() {

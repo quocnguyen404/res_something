@@ -1,8 +1,9 @@
 package listener;
 
 public enum Event {
-    Login,
-    LoginSuccess,
-    LoginFail,
-    
+    Authenticate,
+    Attendance,
+    CreateOrder,
+    SubmitOrder,
+    Logout,
 }

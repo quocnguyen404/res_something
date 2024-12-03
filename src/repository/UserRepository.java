@@ -7,7 +7,7 @@ import dao.User;
 public class UserRepository extends Repository<String, User> {
 
     public UserRepository() {
-        DLF = 6;
+        DLF = 7;
         DATA_PATH = AppConstant.DATA_PREFIX+"user"+AppConstant.DATA_SUFFIX;
         TEMP_DATA_PATH = AppConstant.DATA_PREFIX+"user"+AppConstant.DATA_TEMP_SUFFIX;
         loadAllDataFromFile();
@@ -41,7 +41,7 @@ public class UserRepository extends Repository<String, User> {
 
     @Override
     protected String objectToData(User obj) {
-        return String.format("%s,%s,%s,%s,%s,%s", obj.getUserName(), obj.getEncodePassword(),
+        return String.format("%s,%s,%s,%s,%s,%s,%s", obj.getUserName(), obj.getEncodePassword(),
                                                          obj.getPassword(), obj.getFirstName(),
                                                          obj.getLastName(), obj.getLoginCount(),
                                                          obj.getRole());

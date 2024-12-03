@@ -3,8 +3,8 @@ package dto.response;
 
 public class UserResponse {
     private String userName;
-    private String encodePassword;
-    private String password;
+    // private String encodePassword;
+    // private String password;
     private String firstName;
     private String lastName;
     private dao.Role role;
@@ -15,20 +15,21 @@ public class UserResponse {
     public void setUserName(String userName) {
         this.userName = userName;
     }
-    public String getEncodePassword() {
-        return encodePassword;
-    }
-    public void setEncodePassword(String encodePassword) {
-        this.encodePassword = encodePassword;
-    }
 
-    public String getPassword() {
-        return password;
-    }
+    // public String getEncodePassword() {
+    //     return encodePassword;
+    // }
+    // public void setEncodePassword(String encodePassword) {
+    //     this.encodePassword = encodePassword;
+    // }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    // public String getPassword() {
+    //     return password;
+    // }
+
+    // public void setPassword(String password) {
+    //     this.password = password;
+    // }
     
     public String getFirstName() {
         return firstName;
