@@ -37,7 +37,7 @@ public class RegistrationGUI extends Application {
             if (isValidPassword(password)) {
                 saveUserToFile(username, password);
                 showAlert("Success", "Registration successful!");
-                primaryStage.close(); // Close registration window
+                primaryStage.close();
             } else {
                 showAlert("Error", "Password cannot contain spaces. Please try again.");
             }

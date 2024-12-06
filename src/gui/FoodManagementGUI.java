@@ -18,13 +18,11 @@ public class FoodManagementGUI extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Food Management");
 
-        // Set up grid layout
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         gridPane.setHgap(10);
         gridPane.setVgap(10);
 
-        // Create UI components
         Label foodLabel = new Label("Food Item:");
         TextField foodTextField = new TextField();
         Label priceLabel = new Label("Price:");
@@ -40,11 +38,10 @@ public class FoodManagementGUI extends Application {
                 foodListView.getItems().add(foodEntry);
                 foodTextField.clear();
                 priceTextField.clear();
-                saveFoodItem(foodEntry); // Save food item to file
+                saveFoodItem(foodEntry);
             }
         });
 
-        // Add components to grid
         gridPane.add(foodLabel, 0, 0);
         gridPane.add(foodTextField, 1, 0);
         gridPane.add(priceLabel, 0, 1);
@@ -52,7 +49,6 @@ public class FoodManagementGUI extends Application {
         gridPane.add(addFoodButton, 1, 2);
         gridPane.add(foodListView, 0, 3, 2, 1);
 
-        // Show scene
         Scene scene = new Scene(gridPane, 400, 300);
         primaryStage.setScene(scene);
         primaryStage.show();

@@ -2,8 +2,9 @@ package gui;
 
 import common.AppConstant;
 import common.Result;
+import dto.request.OrderRequest;
 import dto.response.UserResponse;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonType;
 import repository.DishRepository;
 import repository.UserRepository;
 import services.ManagerService;
@@ -14,6 +15,9 @@ import dto.response.ResponseWrapper;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -24,101 +28,65 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-public class ManagerManagementGUI extends Application {
-    private String loggedInUsername;
-    private ManagerService managerService;
+public class UserManagerGUI extends Application {
 
-    public ManagerManagementGUI(String username) {
+    private ManagerService managerService;
+    private String loggedInUsername;
+    public UserManagerGUI(String username) {
         this.loggedInUsername = username;
-        this.managerService = new ManagerService(new UserRepository(), new DishRepository()); // Initialize here
     }
 
-    public ManagerManagementGUI() {
-        this.managerService = new ManagerService(new UserRepository(), new DishRepository()); // Initialize here as well
+
+    public UserManagerGUI() {
+        // Initialize ManagerService with required repositories
+        this.managerService = new ManagerService(new UserRepository(), new DishRepository());
     }
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Manager Management");
+        primaryStage.setTitle("User Management");
 
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         gridPane.setHgap(10);
         gridPane.setVgap(10);
 
-        Button manageUsersButton = new Button("Manage Users");
         Button manageDishesButton = new Button("Manage Dishes");
-        Button viewFeedbackButton = new Button("View Feedback");
-        Button createOrderButton = new Button("Create Order");
-        Button viewAttendanceButton = new Button("View Attendance");
         Button changePasswordButton = new Button("Change Password");
+        Button createOrderButton = new Button("Create Order");
+        Button btnCheckAttendance = new Button("Check Attendance");
         Button logOutButton = new Button("Log Out");
 
-        manageUsersButton.setOnAction(e -> showUserManagementScreen(primaryStage));
         manageDishesButton.setOnAction(e -> showDishManagementScreen(primaryStage));
-        viewFeedbackButton.setOnAction(e -> showFeedbackScreen(primaryStage));
         changePasswordButton.setOnAction(e -> openChangePasswordScreen());
         logOutButton.setOnAction(e -> handleLogout(primaryStage));
+        btnCheckAttendance.setOnAction(e -> openCheckAttendanceGUI());
         createOrderButton.setOnAction(e -> openOrderScreen());
-        viewAttendanceButton.setOnAction(e -> viewAttendance());
 
         gridPane.add(new Label("Manage Users and Dishes"), 0, 0);
-        gridPane.add(manageUsersButton, 0, 1);
-        gridPane.add(manageDishesButton, 1, 1);
-        gridPane.add(viewFeedbackButton, 0, 2);
-        gridPane.add(changePasswordButton, 0, 3);
-        gridPane.add(logOutButton, 0, 4);
-        gridPane.add(createOrderButton, 1, 2);
-        gridPane.add(viewAttendanceButton, 1, 3);
+        gridPane.add(manageDishesButton, 0, 1);
+        gridPane.add(changePasswordButton, 0, 2);
+        gridPane.add(logOutButton, 0, 3);
+        gridPane.add(createOrderButton, 1, 1);
+        gridPane.add(btnCheckAttendance, 1, 2);
 
         Scene scene = new Scene(gridPane, 400, 300);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void viewAttendance() {
-        String attendanceData = readAttendanceFromFile();
-
+    private void openCheckAttendanceGUI() {
         Stage attendanceStage = new Stage();
-        attendanceStage.setTitle("Attendance List");
-
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(10, 10, 10, 10));
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-
-        TextArea attendanceArea = new TextArea();
-        attendanceArea.setEditable(false);
-        attendanceArea.setText(attendanceData);
-
-        gridPane.add(new Label("Attendance List"), 0, 0);
-        gridPane.add(attendanceArea, 0, 1);
-
-        Scene scene = new Scene(gridPane, 400, 300);
-        attendanceStage.setScene(scene);
-        attendanceStage.show();
-    }
-
-    private String readAttendanceFromFile() {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            List<String> lines = Files.readAllLines(new File("Attendance.txt").toPath());
-
-            for (String line : lines) {
-                sb.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Error", "Failed to read attendance data.");
-        }
-
-        return sb.toString();
+        CheckAttendanceGUI attendanceGUI = new CheckAttendanceGUI();
+        attendanceGUI.start(attendanceStage);
     }
 
     private void openOrderScreen() {
@@ -131,15 +99,6 @@ public class ManagerManagementGUI extends Application {
         }
     }
 
-    private void showFeedbackScreen(Stage primaryStage) {
-        FeedBackGUI feedbackGUI = new FeedBackGUI();  // Khởi tạo FeedBackGUI
-        Stage feedbackStage = new Stage();
-        try {
-            feedbackGUI.start(feedbackStage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     private void handleLogout(Stage primaryStage) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Logout");
@@ -147,10 +106,9 @@ public class ManagerManagementGUI extends Application {
         alert.setContentText("Are you sure you want to log out?");
 
         alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) { // Kiểm tra nút xác nhận
+            if (response == ButtonType.OK) {
                 primaryStage.close();
 
-                // Quay lại màn hình đăng nhập
                 LoginGUI loginGUI = new LoginGUI();
                 Stage loginStage = new Stage();
                 try {
@@ -170,32 +128,6 @@ public class ManagerManagementGUI extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void showUserManagementScreen(Stage primaryStage) {
-        Stage userStage = new Stage();
-        userStage.setTitle("User Management");
-
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(10, 10, 10, 10));
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-
-        Button createUserButton = new Button("Create User");
-        Button updateUserButton = new Button("Update User");
-        Button deleteUserButton = new Button("Delete User");
-
-        createUserButton.setOnAction(e -> handleCreateUser());
-        updateUserButton.setOnAction(e -> handleUpdateUser());
-        deleteUserButton.setOnAction(e -> handleDeleteUser());
-
-        gridPane.add(createUserButton, 0, 0);
-        gridPane.add(updateUserButton, 0, 1);
-        gridPane.add(deleteUserButton, 0, 2);
-
-        Scene userScene = new Scene(gridPane, 400, 300);
-        userStage.setScene(userScene);
-        userStage.show();
     }
 
     private void showDishManagementScreen(Stage primaryStage) {
@@ -222,125 +154,6 @@ public class ManagerManagementGUI extends Application {
         Scene dishScene = new Scene(gridPane, 400, 300);
         dishStage.setScene(dishScene);
         dishStage.show();
-    }
-
-    private void handleCreateUser() {
-        String username = JOptionPane.showInputDialog("Enter Username");
-        if (username == null || username.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Username cannot be empty.");
-            return;
-        }
-
-        String password = JOptionPane.showInputDialog("Enter Password");
-        if (password == null || password.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Password cannot be empty.");
-            return;
-        }
-
-        UserRequest request = new UserRequest();
-        request.setUserName(username);
-        request.setPassword(password);
-
-        ResponseWrapper response = managerService.createUser(request);
-
-        UserResponse userResponse = (UserResponse) response.getData();
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("message", response.getMessage());
-        result.put("username", userResponse.getUserName());
-        result.put("status", "Created");
-
-        JOptionPane.showMessageDialog(null, result.get("message"));
-        saveUserEdit(username, password);
-    }
-
-    private void handleUpdateUser() {
-        String username = JOptionPane.showInputDialog("Enter Username to update");
-        String newPassword = JOptionPane.showInputDialog("Enter New Password");
-
-        if (username == null || username.trim().isEmpty() || newPassword == null || newPassword.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Username and password cannot be empty.");
-            return;
-        }
-
-        String filePath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
-        File file = new File(filePath);
-
-        if (!file.exists()) {
-            JOptionPane.showMessageDialog(null, "User data file not found.");
-            return;
-        }
-
-        try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            List<String> updatedLines = new ArrayList<>();
-            boolean userFound = false;
-
-            for (String line : lines) {
-                String[] tokens = line.split(" ,");  // Đảm bảo dấu phân cách chính xác
-                if (tokens.length >= 2 && tokens[0].trim().equalsIgnoreCase(username)) {  // Dùng equalsIgnoreCase để so sánh không phân biệt hoa thường
-                    updatedLines.add(username + " ," + newPassword);
-                    userFound = true;
-                } else {
-                    updatedLines.add(line);
-                }
-            }
-
-            if (!userFound) {
-                updatedLines.add(username + " ," + newPassword);
-            }
-
-            Files.write(file.toPath(), updatedLines, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-
-            JOptionPane.showMessageDialog(null, "User " + username + " updated successfully.");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Failed to update user.");
-            e.printStackTrace();
-        }
-    }
-
-
-    private void handleDeleteUser() {
-        String username = JOptionPane.showInputDialog("Enter Username to delete");
-
-        if (username == null || username.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Username cannot be empty.");
-            return;
-        }
-
-        String filePath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
-        File file = new File(filePath);
-
-        // Kiểm tra file tồn tại
-        if (!file.exists()) {
-            JOptionPane.showMessageDialog(null, "User data file not found.");
-            return;
-        }
-
-        try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            List<String> updatedLines = new ArrayList<>();
-            boolean userFound = false;
-            for (String line : lines) {
-                String[] tokens = line.split(" ,");
-                if (tokens.length >= 2 && tokens[0].equalsIgnoreCase(username)) {
-                    userFound = true;
-                } else {
-                    updatedLines.add(line);
-                }
-            }
-
-            if (!userFound) {
-                JOptionPane.showMessageDialog(null, "User " + username + " not found.");
-                return;
-            }
-            Files.write(file.toPath(), updatedLines, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-
-            JOptionPane.showMessageDialog(null, "User " + username + " removed successfully.");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Failed to remove user.");
-            e.printStackTrace();
-        }
     }
 
 
@@ -467,17 +280,7 @@ public class ManagerManagementGUI extends Application {
             e.printStackTrace();
         }
     }
-    private void saveUserEdit(String username, String password) {
-        String directoryPath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
-            writer.write(username + "," + password);
-            writer.newLine();
-        } catch (IOException e) {
-            showAlert("Error", "Failed to save user data.");
-            e.printStackTrace();
-        }
-    }
 
     private void saveFoodItem(String dishName, double price) {
         String directoryPath = "D:\\demo (4)\\res_something\\food_data.txt";
@@ -497,6 +300,95 @@ public class ManagerManagementGUI extends Application {
             e.printStackTrace();  // In ra chi tiết lỗi
         }
     }
+
+//    private void createOrder() {
+//        String orderID = JOptionPane.showInputDialog("Enter Order ID");
+//        String dishNames = JOptionPane.showInputDialog("Enter Dish Names (separate with commas)");
+//        String prices = JOptionPane.showInputDialog("Enter Prices for Dishes (separate with commas)");
+//
+//        if (orderID == null || dishNames == null || prices == null || orderID.isEmpty() || dishNames.isEmpty() || prices.isEmpty()) {
+//            JOptionPane.showMessageDialog(null, "All fields must be filled.");
+//            return;
+//        }
+//
+//        String[] dishesArray = dishNames.split(",");
+//        String[] pricesArray = prices.split(",");
+//        Map<String, Integer> dishes = new HashMap<>();
+//        double totalPrice = 0.0;
+//
+//        // Loop through the dishes and prices to build the map and calculate the total price
+//        for (int i = 0; i < dishesArray.length; i++) {
+//            try {
+//                String dish = dishesArray[i].trim();
+//                int price = Integer.parseInt(pricesArray[i].trim());
+//                dishes.put(dish, price);  // Put dish name and price (quantity will be 1 here)
+//                totalPrice += price;  // Add the price to the total
+//            } catch (NumberFormatException e) {
+//                JOptionPane.showMessageDialog(null, "Invalid price format.");
+//                return;
+//            }
+//        }
+//
+//        // Get current time as LocalTime and convert it to string
+//        LocalTime currentTime = LocalTime.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+//
+//        // Pass the calculated total price to the OrderRequest constructor
+//        OrderRequest orderRequest = new OrderRequest(Integer.parseInt(orderID), dishes, totalPrice, currentTime);
+//        saveOrderToFile(orderRequest);
+//        JOptionPane.showMessageDialog(null, "Order created successfully!");
+//    }
+//
+//    private void saveOrderToFile(OrderRequest orderRequest) {
+//        String directoryPath = "order.txt";
+//
+//        try {
+//            File dir = new File(directoryPath);
+//            if (!dir.exists()) {
+//                dir.createNewFile();
+//            }
+//
+//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
+//                // Save order to file
+//                writer.write("Order ID: " + orderRequest.getID());
+//                writer.newLine();
+//
+//                // Get just the dish names from the map, join them as a comma-separated string
+//                String dishesString = String.join(", ", orderRequest.getDishes().keySet());
+//                writer.write("Dishes: " + dishesString);
+//                writer.newLine();
+//
+//                writer.write("Price: " + orderRequest.getPrice());
+//                writer.newLine();
+//
+//                // Format the time to display only HH:mm:ss
+//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+//                String formattedTime = orderRequest.getTime().format(formatter);
+//                writer.write("Time: " + formattedTime);
+//                writer.newLine();
+//
+//                writer.write("-----------------------------------");
+//                writer.newLine();
+//            }
+//        } catch (IOException e) {
+//            showAlert("Error", "Failed to save order.");
+//            e.printStackTrace();
+//        }
+//    }
+//
+
+    private void saveUserEdit(String username, String password) {
+        String directoryPath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
+            writer.write(" User: " + username + ", Password: " + password);
+            writer.newLine();
+        } catch (IOException e) {
+            showAlert("Error", "Failed to save user data.");
+            e.printStackTrace();
+        }
+    }
+
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

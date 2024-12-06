@@ -13,7 +13,7 @@ public class UI {
 
     private LoginGUI loginGUI;
     private ManagerManagementGUI managementGUI;
-    private EmployeeManagementGUI employeeManagementGUI;
+
 
     public UI() {
         loginGUI = new LoginGUI();
@@ -63,9 +63,7 @@ public class UI {
             } break;
             
             case STAFF: {
-                employeeManagementGUI = new EmployeeManagementGUI();
                 EventDispatcher.invoke(Event.BindEmployeeEvent, userResponse);
-                employeeManagementGUI.start(arg0);
             } break;
         }
     }

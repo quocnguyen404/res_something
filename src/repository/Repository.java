@@ -7,24 +7,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class Repository<T,T1> {
+public abstract class Repository<T, T1> {
     protected int DLF;
     protected String DATA_PATH;
     protected String TEMP_DATA_PATH;
-    protected Map<T,T1> dataMap;
+    protected Map<T, T1> dataMap;
+
+    public Repository() {
+        this.dataMap = new HashMap<>(); // Khởi tạo dataMap trong constructor
+    }
 
     public List<T1> getDataList() {
-        return new ArrayList<T1>(dataMap.values());
+        return new ArrayList<>(dataMap.values());
     }
 
     protected void loadAllDataFromFile() {
-        dataMap = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(DATA_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(",");
-                if(tokens.length != DLF)
-                    throw new Exception("User data format wrong");    
+                if (tokens.length != DLF)
+                    throw new Exception("User data format wrong");
                 T1 obj = dataToObject(tokens);
                 putObjectToMap(obj);
             }
@@ -44,7 +47,7 @@ public abstract class Repository<T,T1> {
     }
 
     public T1 findObjectByKey(T key) {
-        if(dataMap.containsKey(key)) {
+        if (dataMap != null && dataMap.containsKey(key)) {
             return dataMap.get(key);
         }
         return null;
@@ -68,17 +71,14 @@ public abstract class Repository<T,T1> {
                 }
                 writer.newLine();
             }
-            reader.close();
-            writer.close();
 
-            // Delete the original file and rename the temp file
             if (!new File(DATA_PATH).delete()) {
                 throw new IOException("Could not delete original file");
             }
             if (!tempFile.renameTo(new File(DATA_PATH))) {
                 throw new IOException("Could not rename temp file");
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -97,6 +97,7 @@ public abstract class Repository<T,T1> {
                     writer.newLine();
                 }
             }
+
             if (!new File(DATA_PATH).delete()) {
                 throw new IOException("Could not delete original file");
             }
