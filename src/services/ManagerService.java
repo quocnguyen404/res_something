@@ -1,31 +1,64 @@
 package services;
 
+import repository.AttendanceRepository;
 import repository.DishRepository;
 import repository.UserRepository;
 import utilities.PasswordEncoder;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import common.AppConstant;
 import common.Result;
+import dao.Attendance;
 import dao.Dish;
 import dao.User;
 import dto.request.DishRequest;
 import dto.request.UserRequest;
+import dto.response.AttendanceResponse;
 import dto.response.ResponseWrapper;
+import mapper.AttendanceMapper;
 import mapper.DishMapper;
 import mapper.UserMapper;
 
 public class ManagerService {
     private final UserRepository userRepository;
     private final DishRepository dishRepository;
+    private final AttendanceRepository attendanceRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public ManagerService(UserRepository userRepository, DishRepository dishRepository) {
+    public ManagerService(UserRepository userRepository, DishRepository dishRepository, AttendanceRepository attendanceRepository) {
         this.userRepository = userRepository;
         this.dishRepository = dishRepository;
+        this.attendanceRepository = attendanceRepository;
         passwordEncoder = new PasswordEncoder();
+    }
+
+    //Check attendance
+    public ResponseWrapper getAttendances(LocalDate date) {
+        Map<Object, Object> resultExecute = new HashMap<>();
+        List<Attendance> attendances = attendanceRepository.getAllDataFromFIle(date);
+        
+        if(attendances == null) {
+            resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
+            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist attendace data at " + date.toString());
+            return new ResponseWrapper(resultExecute);
+        }
+        
+        AttendanceMapper mapper = new AttendanceMapper();
+        List<AttendanceResponse> attendanceResponse = new ArrayList<>(attendances.size());
+        for (Attendance attendance : attendances) {
+            attendanceResponse.add(mapper.toResponse(attendance));
+        }
+
+        resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, attendanceResponse);
+        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Get attendance list success");
+        return new ResponseWrapper(resultExecute);
     }
 
     //User management
@@ -49,8 +82,6 @@ public class ManagerService {
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
         return new ResponseWrapper(resultExecute);
     }
-
-    //TODO create employee with exist user -> encode userName to id
 
     public ResponseWrapper updateUser(UserRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
@@ -88,7 +119,7 @@ public class ManagerService {
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
         return new ResponseWrapper(resultExecute);
     }
-
+    
     //Dish management
     public ResponseWrapper addDish(DishRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();

@@ -3,6 +3,9 @@ package repository;
 import java.util.Map;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,11 +74,15 @@ public abstract class Repository<T, T1> {
                 }
                 writer.newLine();
             }
+            reader.close();
+            writer.close();
 
             if (!new File(DATA_PATH).delete()) {
+                System.out.println(DATA_PATH);
                 throw new IOException("Could not delete original file");
             }
             if (!tempFile.renameTo(new File(DATA_PATH))) {
+                System.out.println(DATA_PATH);
                 throw new IOException("Could not rename temp file");
             }
         } catch (IOException e) {

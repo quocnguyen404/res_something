@@ -1,10 +1,11 @@
 package system;
 
-import listener.ActionListener;
 import listener.ConsumerListener;
 import listener.Event;
 import listener.NonRequestListener;
 import listener.ServiceListener;
+
+
 import dao.Role;
 import dto.request.*;
 import dto.response.UserResponse;
@@ -47,6 +48,9 @@ public class System extends Application{
         ServiceListener<AuthRequest> authenticateListener = new ServiceListener<>(services.getAuthService()::doLogin);
         EventDispatcher.addEvent(Event.Authenticate, authenticateListener);
         
+        ServiceListener<UserRequest> registerListener = new ServiceListener<>(services.getUserService()::register);
+        EventDispatcher.addEvent(Event.Register, registerListener);
+
         ServiceListener<AttendanceRequest> attendanceListener = new ServiceListener<>(services.getSystemService()::checkAttendance);
         EventDispatcher.addEvent(Event.Attendance, attendanceListener);
         
@@ -76,8 +80,8 @@ public class System extends Application{
             e.printStackTrace();
             return;
         }
-
         //TODO bind manager services
+        
     }
 
     private void BindEmployeeEvent(UserResponse user) {

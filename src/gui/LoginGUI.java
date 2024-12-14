@@ -7,11 +7,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.BufferedWriter;
+import listener.Event;
+import system.EventDispatcher;
+import dto.request.AuthRequest;
+
 
 public class LoginGUI extends Application {
 
@@ -43,30 +42,21 @@ public class LoginGUI extends Application {
             String username = userTextField.getText();
             String password = passwordField.getText();
 
-            String role = validateUser(username, password);
+            AuthRequest authRequest = new AuthRequest(username, password);
 
-            if (role != null) {
-                if (role.equals("MANAGER")) {
-                    ManagerManagementGUI managerManagementGUI = new ManagerManagementGUI(username);
-                    managerManagementGUI.start(new Stage());
-                    primaryStage.close();
-                } else {
-                    UserManagerGUI userManagerGUI = new UserManagerGUI(username);
-                    userManagerGUI.start(new Stage());
-                    primaryStage.close();
-                }
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Login Error");
-                alert.setHeaderText("Invalid username or password");
-                alert.showAndWait();
-            }
+            EventDispatcher.invoke(Event.Authenticate, authRequest);
+            EventDispatcher.invoke(Event.HandleLogin);
         });
 
         registerButton.setOnAction(event -> {
-            RegisterGUI registerGUI = new RegisterGUI();
-            registerGUI.start(new Stage());
-            primaryStage.close();
+            EventDispatcher.invoke(Event.RegisterUI, new Stage());
+            
+            try {
+                this.stop();
+                primaryStage.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         Scene scene = new Scene(gridPane, 300, 200);
@@ -74,39 +64,39 @@ public class LoginGUI extends Application {
         primaryStage.show();
     }
 
-    private String validateUser(String username, String password) {
-        String filePath = "D:\\demo (4)\\res_something\\user_data.txt";
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
+    // private String validateUser(String username, String password) {
+    //     String filePath = "D:\\demo (4)\\res_something\\user_data.txt";
+    //     try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+    //         String line;
+    //         while ((line = reader.readLine()) != null) {
+    //             line = line.trim();
 
-                String[] credentials = line.split(":");
+    //             String[] credentials = line.split(":");
 
-                if (credentials.length == 3) {
-                    String fileUsername = credentials[0].trim();
-                    String filePassword = credentials[1].trim();
-                    String fileRole = credentials[2].trim();
+    //             if (credentials.length == 3) {
+    //                 String fileUsername = credentials[0].trim();
+    //                 String filePassword = credentials[1].trim();
+    //                 String fileRole = credentials[2].trim();
 
-                    if (fileUsername.equals(username) && filePassword.equals(password)) {
-                        return fileRole;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+    //                 if (fileUsername.equals(username) && filePassword.equals(password)) {
+    //                     return fileRole;
+    //                 }
+    //             }
+    //         }
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
+    //     return null;
+    // }
 
-    private void saveUser(String username, String password, String role) {
-        String directoryPath = "D:\\demo (4)\\res_something\\user_data.txt";
+    // private void saveUser(String username, String password, String role) {
+    //     String directoryPath = "D:\\demo (4)\\res_something\\user_data.txt";
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
-            writer.write(username + ":" + password + ":" + role);
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    //     try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
+    //         writer.write(username + ":" + password + ":" + role);
+    //         writer.newLine();
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 }

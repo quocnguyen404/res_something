@@ -4,7 +4,7 @@ import dto.response.ResponseWrapper;
 
 import java.util.function.Function;
 
-public class ServiceListener<Type> extends Listener{
+public class ServiceListener<Type> extends DListener{
     
     private Function<Type, ResponseWrapper> callback;
 

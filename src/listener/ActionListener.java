@@ -22,4 +22,8 @@ public class ActionListener extends Listener {
             e.printStackTrace();
         }
     }
+
+    public void clear() {
+        callback = null;
+    }
 }

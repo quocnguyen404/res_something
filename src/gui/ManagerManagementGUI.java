@@ -1,14 +1,15 @@
 package gui;
 
-import common.AppConstant;
-import common.Result;
 import dto.response.UserResponse;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import repository.DishRepository;
 import repository.UserRepository;
 import services.ManagerService;
+import system.EventDispatcher;
 import dto.request.UserRequest;
 import dto.request.DishRequest;
+import dto.response.AttendanceResponse;
 import dto.response.DishResponse;
 import dto.response.ResponseWrapper;
 import javafx.application.Application;
@@ -16,12 +17,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import listener.Event;
 
 import javax.swing.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.http.WebSocket.Listener;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -30,17 +33,17 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class ManagerManagementGUI extends Application {
-    private String loggedInUsername;
-    private ManagerService managerService;
+    // private String loggedInUsername;
+    // private ManagerService managerService;
 
-    public ManagerManagementGUI(String username) {
-        this.loggedInUsername = username;
-        this.managerService = new ManagerService(new UserRepository(), new DishRepository()); // Initialize here
-    }
+    // public ManagerManagementGUI(String username) {
+    //     this.loggedInUsername = username;
+    //     this.managerService = new ManagerService(new UserRepository(), new DishRepository()); // Initialize here
+    // }
 
-    public ManagerManagementGUI() {
-        this.managerService = new ManagerService(new UserRepository(), new DishRepository()); // Initialize here as well
-    }
+    // public ManagerManagementGUI() {
+    //     this.managerService = new ManagerService(new UserRepository(), new DishRepository()); // Initialize here as well
+    // }
 
     @Override
     public void start(Stage primaryStage) {
@@ -82,6 +85,8 @@ public class ManagerManagementGUI extends Application {
     }
 
     private void viewAttendance() {
+        //TODO add GetAttendances event
+        EventDispatcher.invoke(Event.GetAttendances);
         String attendanceData = readAttendanceFromFile();
 
         Stage attendanceStage = new Stage();
@@ -106,18 +111,25 @@ public class ManagerManagementGUI extends Application {
 
     private String readAttendanceFromFile() {
         StringBuilder sb = new StringBuilder();
-
+        // 
+        listener.Listener listener = EventDispatcher.getListener(Event.GetAttendances);
+        ResponseWrapper response = listener.getResponse();
+        if(!response.isOK()) {
+            UIUtilities.showAlert("Alert", response.getMessage(), AlertType.ERROR);
+            return null;
+        }
         try {
-            List<String> lines = Files.readAllLines(new File("Attendance.txt").toPath());
-
-            for (String line : lines) {
-                sb.append(line).append("\n");
+            @SuppressWarnings("unchecked")
+            //TODO 
+            List<AttendanceResponse> list = (List<AttendanceResponse>)response.getData();
+            for (AttendanceResponse attendanceResponse : list) {
+                // sb.append(attendanceResponse.getID())
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to read attendance data.");
         }
 
+        listener.clear();
         return sb.toString();
     }
 
@@ -506,7 +518,7 @@ public class ManagerManagementGUI extends Application {
         alert.showAndWait();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    // public static void main(String[] args) {
+    //     launch(args);
+    // }
 }

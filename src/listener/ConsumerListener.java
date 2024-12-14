@@ -25,5 +25,9 @@ public class ConsumerListener<T> extends Listener {
             e.printStackTrace();
         }
     }
+
+    public void clear() {
+        callback = null;
+    }
     
 }

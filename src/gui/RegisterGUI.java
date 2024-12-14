@@ -4,12 +4,19 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import listener.Event;
+import system.EventDispatcher;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import javax.swing.text.Utilities;
+
+import dto.request.UserRequest;
 
 public class RegisterGUI extends Application {
 
@@ -55,34 +62,32 @@ public class RegisterGUI extends Application {
             String username = userTextField.getText();
             String password = passwordField.getText();
             String confirmPassword = confirmPasswordField.getText();
-            String role = roleComboBox.getValue(); // Get selected role (should always be "EMPLOYEE")
+            // String role = roleComboBox.getValue(); // Get selected role (should always be "EMPLOYEE")
+            boolean valid = utilities.AppUtilities.validateUserName(username);
+            valid = valid && utilities.AppUtilities.validatePassword(password);
+            valid = valid && password.equals(confirmPassword);
 
-            if (password.equals(confirmPassword)) {
-                // Save user data including role
-                saveUser(username, password, role);
+            if (valid) {
+                UserRequest userRequest = new UserRequest();
+                userRequest.setUserName(username);
+                userRequest.setPassword(password);
 
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Registration Success");
-                alert.setHeaderText("User successfully registered!");
-                alert.setContentText("You can now log in with your new account.");
-                alert.showAndWait();
-
-                // After successful registration, open login screen
-                LoginGUI loginGUI = new LoginGUI();
-                loginGUI.start(new Stage());
+                EventDispatcher.invoke(Event.Register, userRequest);
+                EventDispatcher.invoke(Event.HandleRegister);
                 primaryStage.close(); // Close register window
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Registration Error");
-                alert.setHeaderText("Passwords do not match");
-                alert.showAndWait();
+                UIUtilities.showAlert("Registration Error", "Not valid password or user name", AlertType.ERROR);
             }
         });
 
         backButton.setOnAction(event -> {
-            LoginGUI loginGUI = new LoginGUI();
-            loginGUI.start(new Stage());
-            primaryStage.close(); // Close register window
+            EventDispatcher.invoke(Event.LoginUI, new Stage());
+            try {
+                this.stop();
+                primaryStage.close(); // Close register window
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         Scene scene = new Scene(gridPane, 400, 250);

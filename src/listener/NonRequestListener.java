@@ -4,7 +4,7 @@ import dto.response.ResponseWrapper;
 
 import java.util.function.Supplier;
 
-public class NonRequestListener extends Listener{
+public class NonRequestListener extends DListener{
     private Supplier<ResponseWrapper> callback;
 
     public NonRequestListener() {

@@ -29,6 +29,36 @@ public abstract class DynamicRepository<T,T1> {
         return new ArrayList<T1>(dataMap.values());
     }
 
+    public List<T1> getAllDataFromFIle(LocalDate date) {
+        if(date.equals(LocalDate.now()))
+            return getDataList();
+        String file = DATA_FOLDER+currentDate+AppConstant.DATA_SUFFIX;
+        Path path = Paths.get(file);
+        Map<T, T1> tempMap = new HashMap<>(dataMap);
+        dataMap = new HashMap<>();
+        try {
+            if(Files.exists(path)) {
+                try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while((line = reader.readLine()) != null) {
+                        String[] tokens = line.split(",");
+                        if(tokens.length != DLF)
+                            throw new Exception("Data format wrong");
+                        T1 obj = dataToObject(tokens);
+                        putObjectToMap(obj);
+                    }
+                }
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ArrayList<T1> result = new ArrayList<>(dataMap.values());
+        dataMap = tempMap;
+        return result;
+    }
+
     protected void loadAllDataFromFile() {
         String file = DATA_FOLDER+currentDate+AppConstant.DATA_SUFFIX;
         Path path = Paths.get(file);
@@ -96,6 +126,8 @@ public abstract class DynamicRepository<T,T1> {
                 }
                 writer.newLine();
             }
+            reader.close();
+            writer.close();
 
             if (!new File(dataPath).delete()) {
                 throw new IOException("Could not delete original file");

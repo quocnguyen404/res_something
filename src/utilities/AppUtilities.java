@@ -8,4 +8,12 @@ public class AppUtilities {
             return null;
         return LocalTime.parse(str);
     }
+
+    public static Boolean validateUserName(String userName) {
+        return userName != null && !userName.isEmpty();
+    }
+
+    public static Boolean validatePassword(String password) {
+        return password != null && password.length() >= 4;
+    }
 }
