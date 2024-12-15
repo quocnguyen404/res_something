@@ -8,9 +8,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import repository.DishRepository;
-import repository.UserRepository;
-import services.ManagerService;
 
 import javax.swing.*;
 import java.io.BufferedWriter;
@@ -24,10 +21,10 @@ import java.util.Map;
 
 public class OrderGUI {
 
-    private ManagerService managerService;
+    // private ManagerService managerService;
 
     public OrderGUI() {
-        this.managerService = new ManagerService(new UserRepository(), new DishRepository());
+        // this.managerService = new ManagerService(new UserRepository(), new DishRepository());
     }
 
     public void start(Stage primaryStage) {

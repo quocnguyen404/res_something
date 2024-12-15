@@ -2,12 +2,14 @@ package system;
 
 import listener.ConsumerListener;
 import listener.Event;
-import listener.NonRequestListener;
+import listener.FunctionListener;
 import listener.ServiceListener;
 
+import java.time.LocalDate;
 
 import dao.Role;
 import dto.request.*;
+import dto.response.ResponseWrapper;
 import dto.response.UserResponse;
 import javafx.stage.Stage;
 import javafx.application.Application;
@@ -54,13 +56,13 @@ public class System extends Application{
         ServiceListener<AttendanceRequest> attendanceListener = new ServiceListener<>(services.getSystemService()::checkAttendance);
         EventDispatcher.addEvent(Event.Attendance, attendanceListener);
         
-        NonRequestListener createOrderListener = new NonRequestListener(services.getSystemService()::createOrder);
+        FunctionListener<ResponseWrapper> createOrderListener = new FunctionListener<>(services.getSystemService()::createOrder);
         EventDispatcher.addEvent(Event.CreateOrder, createOrderListener);
 
         ServiceListener<OrderRequest> submitOrderListener = new ServiceListener<>(services.getSystemService()::submitOrder);
         EventDispatcher.addEvent(Event.SubmitOrder, submitOrderListener);
 
-        NonRequestListener logoutListener = new NonRequestListener(services.getSystemService()::doLogout);
+        FunctionListener<ResponseWrapper> logoutListener = new FunctionListener<>(services.getSystemService()::doLogout);
         EventDispatcher.addEvent(Event.Logout, logoutListener);
 
         ConsumerListener<UserResponse> bindManagerListener = new ConsumerListener<>(this::bindManagerEvent);
@@ -82,6 +84,8 @@ public class System extends Application{
         }
         //TODO bind manager services
         
+        ServiceListener<LocalDate> getAttendanceListListener = new ServiceListener<>(services.getManagerService()::getAttendances);
+        EventDispatcher.addEvent(Event.GetAttendances, getAttendanceListListener);
     }
 
     private void BindEmployeeEvent(UserResponse user) {
@@ -96,5 +100,7 @@ public class System extends Application{
         }
 
         //TODO bind manager services
+        ServiceListener<ChangePasswordRequest> changePasswordListener = new ServiceListener<>(services.getUserService()::changePassword);
+        EventDispatcher.addEvent(Event.ChangePassword, changePasswordListener);
     }
 }

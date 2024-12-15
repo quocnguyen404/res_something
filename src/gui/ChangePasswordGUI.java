@@ -1,33 +1,21 @@
 package gui;
 
+import dto.request.ChangePasswordRequest;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import listener.Event;
+import listener.Listener;
+import system.EventDispatcher;
+import system.SystemUser;
 
 public class ChangePasswordGUI extends Application {
 
-    private String loggedInUsername;
-    private final String userDataFile = "user_data.txt";
-
-    public ChangePasswordGUI(String username) {
-        this.loggedInUsername = username;
-    }
-
     @Override
     public void start(Stage stage) {
-        if (loggedInUsername == null || loggedInUsername.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "No username provided! Please log in first.");
-            stage.close();
-            return;
-        }
-
         stage.setTitle("Change Password");
 
         // Grid layout
@@ -59,23 +47,22 @@ public class ChangePasswordGUI extends Application {
             String currentPassword = currentPasswordField.getText();
             String newPassword = newPasswordField.getText();
             String confirmPassword = confirmPasswordField.getText();
+            
+            EventDispatcher.invoke(Event.GetSystemUser);
+            Listener listener = EventDispatcher.getListener(Event.GetSystemUser);
+            SystemUser user = listener.getData();
+            listener.clearData();
+            
+            ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest(user.getUserName(), currentPassword, newPassword, confirmPassword);
+            EventDispatcher.invoke(Event.ChangePassword, changePasswordRequest);
+            EventDispatcher.invoke(Event.HandleChangePassword);
 
-            Map<String, String[]> userData = loadUserData();
-
-            if (!userData.containsKey(loggedInUsername) || !userData.get(loggedInUsername)[0].equals(currentPassword)) {
-                showAlert(Alert.AlertType.ERROR, "Error", "Current password is incorrect.");
-                return;
+            stage.close();
+            try {
+                this.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            if (!newPassword.equals(confirmPassword)) {
-                showAlert(Alert.AlertType.ERROR, "Error", "New password and confirmation do not match.");
-                return;
-            }
-
-            String role = userData.get(loggedInUsername)[1];
-            userData.put(loggedInUsername, new String[]{newPassword, role});
-            saveUserData(userData);
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Password updated successfully.");
         });
 
         Scene scene = new Scene(gridPane, 400, 200);
@@ -83,53 +70,5 @@ public class ChangePasswordGUI extends Application {
         stage.show();
     }
 
-    /**
-     * Load user data from file.
-     * Each entry in the file should be in the format: username:password:role
-     */
-    private Map<String, String[]> loadUserData() {
-        Map<String, String[]> userData = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(userDataFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(":", 3); // Tách thành 3 phần: username, password, role
-                if (parts.length == 3) {
-                    userData.put(parts[0], new String[]{parts[1], parts[2]}); // {password, role}
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return userData;
-    }
-
-    /**
-     * Save user data back to file.
-     * Writes each entry in the format: username:password:role
-     */
-    private void saveUserData(Map<String, String[]> userData) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(userDataFile))) {
-            for (Map.Entry<String, String[]> entry : userData.entrySet()) {
-                writer.write(entry.getKey() + ":" + entry.getValue()[0] + ":" + entry.getValue()[1]);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Show alert dialog.
-     */
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    // public static void main(String[] args) {
-    //     launch(args);
-    // }
+    // private void handleLogin
 }

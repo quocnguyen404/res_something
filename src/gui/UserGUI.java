@@ -28,19 +28,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-public class UserManagerGUI extends Application {
+public class UserGUI extends Application {
 
-    private ManagerService managerService;
-    private String loggedInUsername;
-    public UserManagerGUI(String username) {
-        this.loggedInUsername = username;
-    }
+    // private ManagerService managerService;
+    // private String loggedInUsername;
+    // public UserManagerGUI(String username) {
+    //     this.loggedInUsername = username;
+    // }
 
 
-    public UserManagerGUI() {
-        // Initialize ManagerService with required repositories
-        this.managerService = new ManagerService(new UserRepository(), new DishRepository());
-    }
+    // public UserManagerGUI() {
+    //     // Initialize ManagerService with required repositories
+    //     // this.managerService = new ManagerService(new UserRepository(), new DishRepository());
+    // }
 
     @Override
     public void start(Stage primaryStage) {
@@ -113,7 +113,7 @@ public class UserManagerGUI extends Application {
     }
 
     private void openChangePasswordScreen() {
-        ChangePasswordGUI changePasswordGUI = new ChangePasswordGUI(loggedInUsername);
+        ChangePasswordGUI changePasswordGUI = new ChangePasswordGUI();
         Stage stage = new Stage();
         try {
             changePasswordGUI.start(stage);
@@ -162,7 +162,9 @@ public class UserManagerGUI extends Application {
         }
 
         DishRequest request = new DishRequest(dishName, price);
-        ResponseWrapper response = managerService.addDish(request);
+        //TODO
+        ResponseWrapper response = new ResponseWrapper();
+
 
         DishResponse dishResponse = (DishResponse) response.getData();
 
@@ -369,17 +371,17 @@ public class UserManagerGUI extends Application {
 //    }
 //
 
-    private void saveUserEdit(String username, String password) {
-        String directoryPath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
+    // private void saveUserEdit(String username, String password) {
+    //     String directoryPath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
-            writer.write(" User: " + username + ", Password: " + password);
-            writer.newLine();
-        } catch (IOException e) {
-            showAlert("Error", "Failed to save user data.");
-            e.printStackTrace();
-        }
-    }
+    //     try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
+    //         writer.write(" User: " + username + ", Password: " + password);
+    //         writer.newLine();
+    //     } catch (IOException e) {
+    //         showAlert("Error", "Failed to save user data.");
+    //         e.printStackTrace();
+    //     }
+    // }
 
 
     private void showAlert(String title, String message) {

@@ -14,8 +14,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.swing.text.Utilities;
-
 import dto.request.UserRequest;
 
 public class RegisterGUI extends Application {
@@ -81,10 +79,9 @@ public class RegisterGUI extends Application {
         });
 
         backButton.setOnAction(event -> {
-            EventDispatcher.invoke(Event.LoginUI, new Stage());
+            primaryStage.close(); // Close register window
             try {
                 this.stop();
-                primaryStage.close(); // Close register window
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -93,16 +90,5 @@ public class RegisterGUI extends Application {
         Scene scene = new Scene(gridPane, 400, 250);
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
-    // Save user to file with role
-    private void saveUser(String username, String password, String role) {
-        String directoryPath = "D:\\demo (4)\\res_something\\user_data.txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
-            writer.write(username + ":" + password + ":" + role);
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

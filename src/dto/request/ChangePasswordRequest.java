@@ -1,17 +1,26 @@
 package dto.request;
 
-public class UserChangePasswordRequest {
+public class ChangePasswordRequest {
+    private String userName;
     private String currentPassword;
     private String newPassword;
     private String confirmPassword;
 
-    public UserChangePasswordRequest() {
+    public ChangePasswordRequest() {
     }
 
-    public UserChangePasswordRequest(String currentPassword, String newPassword, String confirmPassword) {
+    public ChangePasswordRequest(String userName, String currentPassword, String newPassword, String confirmPassword) {
         this.currentPassword = currentPassword;
         this.newPassword = newPassword;
         this.confirmPassword = confirmPassword;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getCurrentPassword() {

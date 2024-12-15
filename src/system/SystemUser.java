@@ -3,11 +3,15 @@ package system;
 import dao.Role;
 import dto.response.UserResponse;
 
-class SystemUser {
+public class SystemUser {
     private UserResponse userData;
 
-    public SystemUser(UserResponse userResponse) {
+    SystemUser(UserResponse userResponse) {
         userData = userResponse;
+    }
+
+    public String getUserName() {
+        return userData.getUserName();
     }
 
     public String getFirstName() {

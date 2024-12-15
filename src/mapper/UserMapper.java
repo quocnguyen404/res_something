@@ -31,7 +31,6 @@ public class UserMapper {
     public UserResponse toResponse(User user) {
         UserResponse userResponse = new UserResponse();
         userResponse.setUserName(user.getUserName());
-        //TODO handle user response password
         // userResponse.setEncodePassword(user.getEncodePassword());
         // userResponse.setPassword(user.getPassword());
         userResponse.setFirstName(user.getFirstName());

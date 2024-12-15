@@ -1,7 +1,5 @@
 package listener;
 
-import dto.response.ResponseWrapper;
-
 public class Listener {
     Listener() {}
     public void invoke() {}
@@ -9,10 +7,17 @@ public class Listener {
     public <T, T1> void invoke(T d, T1 d1) {}
     public <T, T1, T2> void invoke(T d, T1 d1, T2 d2) {}
 
-    public ResponseWrapper getResponse() {
+    // public ResponseWrapper getResponse() {
+    //     return null;
+    // }
+
+    public <T> T getData() {
         return null;
     }
 
     public void clear() {
+    }
+
+    public void clearData() {
     }
 }

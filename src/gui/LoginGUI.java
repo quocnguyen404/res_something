@@ -13,6 +13,7 @@ import dto.request.AuthRequest;
 
 
 public class LoginGUI extends Application {
+    private Stage childStage;
 
     @Override
     public void start(Stage primaryStage) {
@@ -43,60 +44,17 @@ public class LoginGUI extends Application {
             String password = passwordField.getText();
 
             AuthRequest authRequest = new AuthRequest(username, password);
-
             EventDispatcher.invoke(Event.Authenticate, authRequest);
             EventDispatcher.invoke(Event.HandleLogin);
         });
 
+        childStage = new Stage();
         registerButton.setOnAction(event -> {
-            EventDispatcher.invoke(Event.RegisterUI, new Stage());
-            
-            try {
-                this.stop();
-                primaryStage.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            EventDispatcher.invoke(Event.RegisterUI, childStage);
         });
 
         Scene scene = new Scene(gridPane, 300, 200);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-    // private String validateUser(String username, String password) {
-    //     String filePath = "D:\\demo (4)\\res_something\\user_data.txt";
-    //     try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-    //         String line;
-    //         while ((line = reader.readLine()) != null) {
-    //             line = line.trim();
-
-    //             String[] credentials = line.split(":");
-
-    //             if (credentials.length == 3) {
-    //                 String fileUsername = credentials[0].trim();
-    //                 String filePassword = credentials[1].trim();
-    //                 String fileRole = credentials[2].trim();
-
-    //                 if (fileUsername.equals(username) && filePassword.equals(password)) {
-    //                     return fileRole;
-    //                 }
-    //             }
-    //         }
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    //     return null;
-    // }
-
-    // private void saveUser(String username, String password, String role) {
-    //     String directoryPath = "D:\\demo (4)\\res_something\\user_data.txt";
-
-    //     try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
-    //         writer.write(username + ":" + password + ":" + role);
-    //         writer.newLine();
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
 }

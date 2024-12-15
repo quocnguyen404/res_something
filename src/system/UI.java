@@ -1,5 +1,6 @@
 package system;
 
+import debug.Debug;
 import dto.response.ResponseWrapper;
 import dto.response.UserResponse;
 import gui.*;
@@ -9,6 +10,7 @@ import listener.*;
 
 public class UI {
     private SystemUser user;
+    private Stage mainStage;
 
     //auth
     private LoginGUI loginGUI;
@@ -18,7 +20,7 @@ public class UI {
     private ManagerManagementGUI managementGUI;
     private FoodManagementGUI foodManagementGUI;
     private StatisticsManagementGUI statisticsManagementGUI;
-    private UserManagerGUI userManagerGUI;
+    private UserGUI userGUI;
     
     //user services
     private OrderGUI orderGUI;
@@ -31,11 +33,17 @@ public class UI {
         registerGUI = new RegisterGUI();
 
         managementGUI = new ManagerManagementGUI();
+        userGUI = new UserGUI();
         bindEvent();
     }
 
     public void start(Stage arg0) {
-        loginGUI.start(arg0);
+        mainStage = arg0;
+        loginGUI.start(mainStage);
+    }
+
+    private SystemUser getUser() {
+        return this.user;
     }
 
     private void bindEvent() {
@@ -45,72 +53,70 @@ public class UI {
         ActionListener handleRegister = new ActionListener(this::handleRegister);
         EventDispatcher.addEvent(Event.HandleRegister, handleRegister);
         
+        ActionListener handleChangPassword = new ActionListener(this::handleChangePassword);
+        EventDispatcher.addEvent(Event.HandleChangePassword, handleChangPassword);
+
         ConsumerListener<Stage> loginUI = new ConsumerListener<>(this.loginGUI::start);
         EventDispatcher.addEvent(Event.LoginUI, loginUI);
 
         ConsumerListener<Stage> registerUI = new ConsumerListener<>(this.registerGUI::start);
         EventDispatcher.addEvent(Event.RegisterUI, registerUI);
+
+        ConsumerListener<Stage> managerUI = new ConsumerListener<>(this.managementGUI::start);
+        EventDispatcher.addEvent(Event.ManagerManagementUI, managerUI);
+
+        ConsumerListener<Stage> userUI = new ConsumerListener<>(this.userGUI::start);
+        EventDispatcher.addEvent(Event.UserUI, userUI);
+
+        FunctionListener<SystemUser> getUser = new FunctionListener<>(this::getUser);
+        EventDispatcher.addEvent(Event.GetSystemUser, getUser);
     }
     
     private void handleLogin() {
         Listener listener = EventDispatcher.getListener(Event.Authenticate);
-        ResponseWrapper loginResponse = listener.getResponse();
-        try {
-            if(loginResponse.isOK()) {
-                handleLoginSuccess(loginResponse);
-            } else {
-                UIUtilities.showAlert("Alert", loginResponse.getMessage(), AlertType.ERROR);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        listener.clear();
-    }
+        ResponseWrapper loginResponse = listener.getData();
+        UIUtilities.showAlert("Information", loginResponse.getMessage(), AlertType.INFORMATION);
 
-    private void handleLoginSuccess(ResponseWrapper response) {
-        UserResponse userResponse = (UserResponse)response.getData();
-        user = new SystemUser(userResponse);
-
-        try {
-            loginGUI.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        switch (user.getRole()) {
-            case MANAGER: {
-                EventDispatcher.invoke(Event.BindManagerEvent, userResponse);
-                managementGUI = new ManagerManagementGUI();
-                //TODO open management ui
-                // managementGUI.start(arg0);
-            } break;
+        if(loginResponse.isOK()) {
+            UserResponse userResponse = (UserResponse)loginResponse.getData();
+            user = new SystemUser(userResponse);
             
-            case STAFF: {
-                EventDispatcher.invoke(Event.BindEmployeeEvent, userResponse);
-            } break;
-        }
+            //close main stage (login ui)
+            mainStage.close();
+            try {
+                loginGUI.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            switch (user.getRole()) {
+                case MANAGER: {
+                    EventDispatcher.invoke(Event.BindManagerEvent, userResponse);
+                    listener.clearData();
+                    EventDispatcher.invoke(Event.ManagerManagementUI, mainStage);
+                } break;
+                
+                case STAFF: {
+                    EventDispatcher.invoke(Event.BindEmployeeEvent, userResponse);
+                    listener.clearData();
+                    EventDispatcher.invoke(Event.UserUI, mainStage);
+                } break;
+            }
+        } 
+        listener.clearData();
     }
 
     private void handleRegister() {
         Listener listener = EventDispatcher.getListener(Event.Register);
-        ResponseWrapper registerResponse = listener.getResponse();
-        try {
-            if(registerResponse.isOK()) {
-                UIUtilities.showAlert("Alert", registerResponse.getMessage(), AlertType.INFORMATION);
-                
-                try {
-                    //TODO open login ui
-                    // loginGUI.start(arg0);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        ResponseWrapper response = listener.getData();
+        UIUtilities.showAlert("Information", response.getMessage(), AlertType.INFORMATION);
+        listener.clearData();
+    }
 
-            } else {
-                UIUtilities.showAlert("Alert", registerResponse.getMessage(), AlertType.ERROR);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        listener.clear();
+    private void handleChangePassword() {
+        Listener listener = EventDispatcher.getListener(Event.HandleChangePassword);
+        ResponseWrapper response = listener.getData();
+        UIUtilities.showAlert("Information", response.getMessage(), AlertType.INFORMATION);
+        listener.clearData();
     }
 }

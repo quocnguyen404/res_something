@@ -3,7 +3,7 @@ package services;
 import common.AppConstant;
 import common.Result;
 import dao.User;
-import dto.request.UserChangePasswordRequest;
+import dto.request.ChangePasswordRequest;
 import dto.request.UserRequest;
 import dto.response.ResponseWrapper;
 import mapper.UserMapper;
@@ -46,31 +46,44 @@ public class UserService {
         return new ResponseWrapper(resultExecute);
     }
 
-    public ResponseWrapper changePassword(UserChangePasswordRequest request, User currentUser) {
+    public ResponseWrapper changePassword(ChangePasswordRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
 
-        try {
-            boolean rightPw = passwordEncoder.matches(currentUser.getEncodePassword(), request.getCurrentPassword()); 
-            boolean rightCofirmPw = request.getNewPassword().equals(request.getConfirmPassword());
-            if(!rightPw) {
-                resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
-                resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Wrong password");
-            }
-            if(!rightCofirmPw) {
-                resultExecute.put(AppConstant.RESPONSE_KEY.RESULT,Result.NotOK());
-                resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Wrong confirm password");
-            }
-            if(rightPw && rightCofirmPw) {
-                currentUser.setPassword(request.getNewPassword());
-                currentUser.setEncodePassword(passwordEncoder.encode(request.getNewPassword()));
-                userRepository.updateObject(currentUser);
-                resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
-                resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Change password success");
-                resultExecute.put(AppConstant.RESPONSE_KEY.DATA, new UserMapper().toResponse(currentUser));
-            }
-        } catch(Exception e) {
-            e.printStackTrace();
+        User currentUser = userRepository.findObjectByKey(request.getUserName());
+
+        if(currentUser == null) {
+            resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
+            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist user");
+            return new ResponseWrapper(resultExecute);
         }
+        
+        String encodePw = passwordEncoder.encode(request.getCurrentPassword());
+        
+        boolean rightPw = passwordEncoder.matches(encodePw, currentUser.getPassword()); 
+        if(!rightPw) {
+            resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
+            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Wrong password");
+            return new ResponseWrapper(resultExecute);
+        }
+
+        boolean rightCofirmPw = request.getNewPassword().equals(request.getConfirmPassword());
+        if(!rightCofirmPw) {
+            resultExecute.put(AppConstant.RESPONSE_KEY.RESULT,Result.NotOK());
+            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Wrong confirm password");
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
+            return new ResponseWrapper(resultExecute);
+        }
+
+        currentUser.setPassword(request.getNewPassword());
+        currentUser.setEncodePassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.updateObject(currentUser);
+        
+        resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
+        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Change password success");
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, new UserMapper().toResponse(currentUser));
+
         return new ResponseWrapper(resultExecute);
     }
 }

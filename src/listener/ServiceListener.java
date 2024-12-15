@@ -4,7 +4,7 @@ import dto.response.ResponseWrapper;
 
 import java.util.function.Function;
 
-public class ServiceListener<Type> extends DListener{
+public class ServiceListener<Type> extends TListener<ResponseWrapper>{
     
     private Function<Type, ResponseWrapper> callback;
 
@@ -23,9 +23,14 @@ public class ServiceListener<Type> extends DListener{
     @Override
     public <T> void invoke(T d) {
         try {
-            response = callback.apply((Type)d);
+            data = callback.apply((Type)d);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void clear() {
+        callback = null;
     }
 }

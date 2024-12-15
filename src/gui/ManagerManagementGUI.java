@@ -3,9 +3,6 @@ package gui;
 import dto.response.UserResponse;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import repository.DishRepository;
-import repository.UserRepository;
-import services.ManagerService;
 import system.EventDispatcher;
 import dto.request.UserRequest;
 import dto.request.DishRequest;
@@ -20,11 +17,11 @@ import javafx.stage.Stage;
 import listener.Event;
 
 import javax.swing.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.http.WebSocket.Listener;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -111,25 +108,26 @@ public class ManagerManagementGUI extends Application {
 
     private String readAttendanceFromFile() {
         StringBuilder sb = new StringBuilder();
-        // 
+
         listener.Listener listener = EventDispatcher.getListener(Event.GetAttendances);
-        ResponseWrapper response = listener.getResponse();
+        ResponseWrapper response = listener.getData();
         if(!response.isOK()) {
             UIUtilities.showAlert("Alert", response.getMessage(), AlertType.ERROR);
             return null;
         }
         try {
             @SuppressWarnings("unchecked")
-            //TODO 
             List<AttendanceResponse> list = (List<AttendanceResponse>)response.getData();
             for (AttendanceResponse attendanceResponse : list) {
                 // sb.append(attendanceResponse.getID())
+                sb.append(utilities.AppUtilities.attendanceResponseToStr(attendanceResponse));
+                sb.append('\n');
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        listener.clear();
+        listener.clearData();
         return sb.toString();
     }
 
@@ -175,13 +173,14 @@ public class ManagerManagementGUI extends Application {
     }
 
     private void openChangePasswordScreen() {
-        ChangePasswordGUI changePasswordGUI = new ChangePasswordGUI(loggedInUsername);
-        Stage stage = new Stage();
-        try {
-            changePasswordGUI.start(stage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //TODO
+        // ChangePasswordGUI changePasswordGUI = new ChangePasswordGUI(loggedInUsername);
+        // Stage stage = new Stage();
+        // try {
+        //     changePasswordGUI.start(stage);
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
     }
 
     private void showUserManagementScreen(Stage primaryStage) {
@@ -253,7 +252,9 @@ public class ManagerManagementGUI extends Application {
         request.setUserName(username);
         request.setPassword(password);
 
-        ResponseWrapper response = managerService.createUser(request);
+        // ResponseWrapper response = managerService.createUser(request);
+        //TODO
+        ResponseWrapper response = new ResponseWrapper();
 
         UserResponse userResponse = (UserResponse) response.getData();
 
@@ -369,7 +370,9 @@ public class ManagerManagementGUI extends Application {
         }
 
         DishRequest request = new DishRequest(dishName, price);
-        ResponseWrapper response = managerService.addDish(request);
+        // ResponseWrapper response = managerService.addDish(request);
+        //TODO
+        ResponseWrapper response = new ResponseWrapper();
 
         DishResponse dishResponse = (DishResponse) response.getData();
 
