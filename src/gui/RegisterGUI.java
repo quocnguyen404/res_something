@@ -8,13 +8,15 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import listener.Event;
+import listener.Listener;
 import system.EventDispatcher;
+import system.SystemUser;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import javax.management.relation.Role;
 
 import dto.request.UserRequest;
+import dto.response.ResponseWrapper;
+import dto.response.UserResponse;
 
 public class RegisterGUI extends Application {
 
@@ -37,13 +39,11 @@ public class RegisterGUI extends Application {
         PasswordField confirmPasswordField = new PasswordField();
         Label roleLabel = new Label("Role:");
 
-        // Change roleComboBox to only have "EMPLOYEE"
         ComboBox<String> roleComboBox = new ComboBox<>();
-        roleComboBox.getItems().add("EMPLOYEE"); // Only allow "EMPLOYEE"
-        roleComboBox.setValue("EMPLOYEE"); // Default role is "EMPLOYEE"
+        UIUtilities.handleRole(roleComboBox);
 
         Button submitButton = new Button("Submit");
-        Button backButton = new Button("Back to Login");
+        Button backButton = new Button("Back");
 
         gridPane.add(userLabel, 0, 0);
         gridPane.add(userTextField, 1, 0);
@@ -60,15 +60,17 @@ public class RegisterGUI extends Application {
             String username = userTextField.getText();
             String password = passwordField.getText();
             String confirmPassword = confirmPasswordField.getText();
-            // String role = roleComboBox.getValue(); // Get selected role (should always be "EMPLOYEE")
-            boolean valid = utilities.AppUtilities.validateUserName(username);
-            valid = valid && utilities.AppUtilities.validatePassword(password);
+            String role = roleComboBox.getSelectionModel().getSelectedItem();
+
+            boolean valid = UIUtilities.validateUserName(username);
+            valid = valid && UIUtilities.validatePassword(password);
             valid = valid && password.equals(confirmPassword);
 
             if (valid) {
                 UserRequest userRequest = new UserRequest();
                 userRequest.setUserName(username);
                 userRequest.setPassword(password);
+                userRequest.setRole(dao.Role.valueOf(role));
 
                 EventDispatcher.invoke(Event.Register, userRequest);
                 EventDispatcher.invoke(Event.HandleRegister);

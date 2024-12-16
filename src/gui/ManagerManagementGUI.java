@@ -30,18 +30,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class ManagerManagementGUI extends Application {
-    // private String loggedInUsername;
-    // private ManagerService managerService;
-
-    // public ManagerManagementGUI(String username) {
-    //     this.loggedInUsername = username;
-    //     this.managerService = new ManagerService(new UserRepository(), new DishRepository()); // Initialize here
-    // }
-
-    // public ManagerManagementGUI() {
-    //     this.managerService = new ManagerService(new UserRepository(), new DishRepository()); // Initialize here as well
-    // }
-
+    private Stage childStage;
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Manager Management");
@@ -59,22 +48,50 @@ public class ManagerManagementGUI extends Application {
         Button changePasswordButton = new Button("Change Password");
         Button logOutButton = new Button("Log Out");
 
-        manageUsersButton.setOnAction(e -> showUserManagementScreen(primaryStage));
-        manageDishesButton.setOnAction(e -> showDishManagementScreen(primaryStage));
-        viewFeedbackButton.setOnAction(e -> showFeedbackScreen(primaryStage));
-        changePasswordButton.setOnAction(e -> openChangePasswordScreen());
-        logOutButton.setOnAction(e -> handleLogout(primaryStage));
-        createOrderButton.setOnAction(e -> openOrderScreen());
-        viewAttendanceButton.setOnAction(e -> viewAttendance());
-
         gridPane.add(new Label("Manage Users and Dishes"), 0, 0);
         gridPane.add(manageUsersButton, 0, 1);
         gridPane.add(manageDishesButton, 1, 1);
         gridPane.add(viewFeedbackButton, 0, 2);
         gridPane.add(changePasswordButton, 0, 3);
-        gridPane.add(logOutButton, 0, 4);
         gridPane.add(createOrderButton, 1, 2);
         gridPane.add(viewAttendanceButton, 1, 3);
+        gridPane.add(logOutButton, 0, 4);
+
+        childStage = new Stage();
+
+        manageUsersButton.setOnAction(e -> {
+            EventDispatcher.invoke(Event.UserManagementUI, childStage);
+        });
+
+        manageDishesButton.setOnAction(e -> {
+            EventDispatcher.invoke(Event.FoodManagementUI, childStage);
+        });
+
+        viewFeedbackButton.setOnAction(e -> {
+            //TODO add FeedbackUI event
+            EventDispatcher.invoke(Event.FeedbackUI, childStage);
+        });
+
+        changePasswordButton.setOnAction(e -> {
+            //TODO add ChangePasswordUI event
+            EventDispatcher.invoke(Event.ChangePasswordUI, childStage);
+        });
+
+        
+        createOrderButton.setOnAction(e -> {
+            //TODO add OrderUI event
+            EventDispatcher.invoke(Event.OrderUI, childStage);
+        });
+        
+        viewAttendanceButton.setOnAction(e -> {
+            //TODO add CheckAttendanceUI event
+            EventDispatcher.invoke(Event.CheckAttendanceUI, childStage);
+        });
+        
+        logOutButton.setOnAction(e -> {
+            //TODO add Logout event
+            EventDispatcher.invoke(Event.Logout);
+        });
 
         Scene scene = new Scene(gridPane, 400, 300);
         primaryStage.setScene(scene);
@@ -120,7 +137,7 @@ public class ManagerManagementGUI extends Application {
             List<AttendanceResponse> list = (List<AttendanceResponse>)response.getData();
             for (AttendanceResponse attendanceResponse : list) {
                 // sb.append(attendanceResponse.getID())
-                sb.append(utilities.AppUtilities.attendanceResponseToStr(attendanceResponse));
+                sb.append(UIUtilities.attendanceResponseToStr(attendanceResponse));
                 sb.append('\n');
             }
         } catch (Exception e) {
@@ -184,29 +201,7 @@ public class ManagerManagementGUI extends Application {
     }
 
     private void showUserManagementScreen(Stage primaryStage) {
-        Stage userStage = new Stage();
-        userStage.setTitle("User Management");
-
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(10, 10, 10, 10));
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-
-        Button createUserButton = new Button("Create User");
-        Button updateUserButton = new Button("Update User");
-        Button deleteUserButton = new Button("Delete User");
-
-        createUserButton.setOnAction(e -> handleCreateUser());
-        updateUserButton.setOnAction(e -> handleUpdateUser());
-        deleteUserButton.setOnAction(e -> handleDeleteUser());
-
-        gridPane.add(createUserButton, 0, 0);
-        gridPane.add(updateUserButton, 0, 1);
-        gridPane.add(deleteUserButton, 0, 2);
-
-        Scene userScene = new Scene(gridPane, 400, 300);
-        userStage.setScene(userScene);
-        userStage.show();
+        
     }
 
     private void showDishManagementScreen(Stage primaryStage) {
@@ -234,128 +229,6 @@ public class ManagerManagementGUI extends Application {
         dishStage.setScene(dishScene);
         dishStage.show();
     }
-
-    private void handleCreateUser() {
-        String username = JOptionPane.showInputDialog("Enter Username");
-        if (username == null || username.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Username cannot be empty.");
-            return;
-        }
-
-        String password = JOptionPane.showInputDialog("Enter Password");
-        if (password == null || password.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Password cannot be empty.");
-            return;
-        }
-
-        UserRequest request = new UserRequest();
-        request.setUserName(username);
-        request.setPassword(password);
-
-        // ResponseWrapper response = managerService.createUser(request);
-        //TODO
-        ResponseWrapper response = new ResponseWrapper();
-
-        UserResponse userResponse = (UserResponse) response.getData();
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("message", response.getMessage());
-        result.put("username", userResponse.getUserName());
-        result.put("status", "Created");
-
-        JOptionPane.showMessageDialog(null, result.get("message"));
-        saveUserEdit(username, password);
-    }
-
-    private void handleUpdateUser() {
-        String username = JOptionPane.showInputDialog("Enter Username to update");
-        String newPassword = JOptionPane.showInputDialog("Enter New Password");
-
-        if (username == null || username.trim().isEmpty() || newPassword == null || newPassword.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Username and password cannot be empty.");
-            return;
-        }
-
-        String filePath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
-        File file = new File(filePath);
-
-        if (!file.exists()) {
-            JOptionPane.showMessageDialog(null, "User data file not found.");
-            return;
-        }
-
-        try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            List<String> updatedLines = new ArrayList<>();
-            boolean userFound = false;
-
-            for (String line : lines) {
-                String[] tokens = line.split(" ,");  // Đảm bảo dấu phân cách chính xác
-                if (tokens.length >= 2 && tokens[0].trim().equalsIgnoreCase(username)) {  // Dùng equalsIgnoreCase để so sánh không phân biệt hoa thường
-                    updatedLines.add(username + " ," + newPassword);
-                    userFound = true;
-                } else {
-                    updatedLines.add(line);
-                }
-            }
-
-            if (!userFound) {
-                updatedLines.add(username + " ," + newPassword);
-            }
-
-            Files.write(file.toPath(), updatedLines, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-
-            JOptionPane.showMessageDialog(null, "User " + username + " updated successfully.");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Failed to update user.");
-            e.printStackTrace();
-        }
-    }
-
-
-    private void handleDeleteUser() {
-        String username = JOptionPane.showInputDialog("Enter Username to delete");
-
-        if (username == null || username.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Username cannot be empty.");
-            return;
-        }
-
-        String filePath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
-        File file = new File(filePath);
-
-        // Kiểm tra file tồn tại
-        if (!file.exists()) {
-            JOptionPane.showMessageDialog(null, "User data file not found.");
-            return;
-        }
-
-        try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            List<String> updatedLines = new ArrayList<>();
-            boolean userFound = false;
-            for (String line : lines) {
-                String[] tokens = line.split(" ,");
-                if (tokens.length >= 2 && tokens[0].equalsIgnoreCase(username)) {
-                    userFound = true;
-                } else {
-                    updatedLines.add(line);
-                }
-            }
-
-            if (!userFound) {
-                JOptionPane.showMessageDialog(null, "User " + username + " not found.");
-                return;
-            }
-            Files.write(file.toPath(), updatedLines, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
-
-            JOptionPane.showMessageDialog(null, "User " + username + " removed successfully.");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Failed to remove user.");
-            e.printStackTrace();
-        }
-    }
-
 
     private void handleAddDish() {
         String dishName = JOptionPane.showInputDialog("Enter Dish Name");
@@ -482,17 +355,6 @@ public class ManagerManagementGUI extends Application {
             e.printStackTrace();
         }
     }
-    private void saveUserEdit(String username, String password) {
-        String directoryPath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
-            writer.write(username + "," + password);
-            writer.newLine();
-        } catch (IOException e) {
-            showAlert("Error", "Failed to save user data.");
-            e.printStackTrace();
-        }
-    }
 
     private void saveFoodItem(String dishName, double price) {
         String directoryPath = "D:\\demo (4)\\res_something\\food_data.txt";
@@ -508,20 +370,8 @@ public class ManagerManagementGUI extends Application {
                 writer.newLine();
             }
         } catch (IOException e) {
-            showAlert("Error", "Failed to save food item. Error: " + e.getMessage());
+            UIUtilities.showAlert("Error", "Failed to save food item. Error: " + e.getMessage(), AlertType.ERROR);
             e.printStackTrace();  // In ra chi tiết lỗi
         }
     }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    // public static void main(String[] args) {
-    //     launch(args);
-    // }
 }

@@ -1,19 +1,22 @@
 
 package gui;
 
+import javax.swing.JOptionPane;
+
+import dto.request.DishRequest;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import listener.Event;
+import system.EventDispatcher;
 
 public class FoodManagementGUI extends Application {
 
+    private Stage childStage;
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Food Management");
@@ -23,52 +26,51 @@ public class FoodManagementGUI extends Application {
         gridPane.setHgap(10);
         gridPane.setVgap(10);
 
-        Label foodLabel = new Label("Food Item:");
-        TextField foodTextField = new TextField();
-        Label priceLabel = new Label("Price:");
-        TextField priceTextField = new TextField();
-        Button addFoodButton = new Button("Add Food Item");
-        ListView<String> foodListView = new ListView<>();
+        Button addDishButton = new Button("Add Dish");
+        Button deleteDishButton = new Button("Delete Dish");
+        Button updateDishButton = new Button("Update Dish");
+        Button viewDishes = new Button("View Dishes");
+        Button backButton = new Button("Back");
+        ListView<String> dishes = new ListView<>();
 
-        addFoodButton.setOnAction(e -> {
-            String foodName = foodTextField.getText();
-            String price = priceTextField.getText();
-            if (!foodName.isEmpty() && !price.isEmpty()) {
-                String foodEntry = foodName + " - $" + price;
-                foodListView.getItems().add(foodEntry);
-                foodTextField.clear();
-                priceTextField.clear();
-                saveFoodItem(foodEntry);
-            }
+        gridPane.add(addDishButton, 0, 1);
+        gridPane.add(deleteDishButton, 1, 1);
+        gridPane.add(updateDishButton, 0, 2);
+        gridPane.add(viewDishes, 1, 2);
+        gridPane.add(backButton, 0, 3);
+        gridPane.add(dishes, 0, 5);
+
+        childStage = new Stage();
+        addDishButton.setOnAction(e -> {
+            EventDispatcher.invoke(Event.AddDishUI, childStage);
         });
 
-        gridPane.add(foodLabel, 0, 0);
-        gridPane.add(foodTextField, 1, 0);
-        gridPane.add(priceLabel, 0, 1);
-        gridPane.add(priceTextField, 1, 1);
-        gridPane.add(addFoodButton, 1, 2);
-        gridPane.add(foodListView, 0, 3, 2, 1);
+        deleteDishButton.setOnAction(e -> {
+            String dishName = JOptionPane.showInputDialog("Enter dish name to delete");
+            if(!UIUtilities.validateInput(dishName)) {
+                UIUtilities.showAlert("Information", "Invalid dish name", AlertType.INFORMATION);
+                return;
+            }
+            DishRequest request = new DishRequest(dishName, 0);
+            EventDispatcher.invoke(Event.DeleteDish, request);
+            EventDispatcher.invoke(Event.HandleDeleteDish);
+        });
+
+        updateDishButton.setOnAction(e -> {
+
+        });
+
+        viewDishes.setOnAction(e -> {
+
+            // dishes.getItems().addAll()
+        });
+
+        backButton.setOnAction(e -> {
+
+        });
 
         Scene scene = new Scene(gridPane, 400, 300);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-    private void saveFoodItem(String foodItem) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("food_data.txt", true))) {
-            writer.write(foodItem);
-            writer.newLine();
-        } catch (IOException e) {
-            showAlert("Error", "Failed to save food item.");
-        }
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
 }

@@ -1,22 +1,27 @@
 package services;
 
 import dao.Attendance;
+import dao.Dish;
 import dto.request.AttendanceRequest;
 import dto.request.AuthRequest;
 import dto.request.OrderRequest;
 import dto.response.CreateOrderResponse;
+import dto.response.DishResponse;
 import dto.response.ResponseWrapper;
 import common.AppConstant;
 import common.Result;
 import dao.User;
 import mapper.AttendanceMapper;
+import mapper.DishMapper;
 import mapper.OrderMapper;
 import repository.AttendanceRepository;
 import repository.DishRepository;
 import repository.OrderRepository;
 import repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SystemService {
@@ -101,6 +106,22 @@ public class SystemService {
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Create order success");
 
+        return new ResponseWrapper(resultExecute);
+    }
+
+    public ResponseWrapper getDishes() {
+        Map<Object, Object> resultExecute = new HashMap<>();
+
+        List<Dish> dishes = dishRepository.getDataList();
+        List<DishResponse> response = new ArrayList<>(dishes.size());
+        DishMapper mapper = new DishMapper();
+        for (Dish dish : dishes) {
+            response.add(mapper.toResponse(dish));
+        }
+
+        resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, response);
+        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Get dishes success");
         return new ResponseWrapper(resultExecute);
     }
 

@@ -47,23 +47,26 @@ public class System extends Application{
 
     private void bindSystemEvent() {
         //system service
-        ServiceListener<AuthRequest> authenticateListener = new ServiceListener<>(services.getAuthService()::doLogin);
-        EventDispatcher.addEvent(Event.Authenticate, authenticateListener);
+        ServiceListener<AuthRequest> authenticate = new ServiceListener<>(services.getAuthService()::doLogin);
+        EventDispatcher.addEvent(Event.Authenticate, authenticate);
         
-        ServiceListener<UserRequest> registerListener = new ServiceListener<>(services.getUserService()::register);
-        EventDispatcher.addEvent(Event.Register, registerListener);
+        ServiceListener<UserRequest> register = new ServiceListener<>(services.getUserService()::register);
+        EventDispatcher.addEvent(Event.Register, register);
 
-        ServiceListener<AttendanceRequest> attendanceListener = new ServiceListener<>(services.getSystemService()::checkAttendance);
-        EventDispatcher.addEvent(Event.Attendance, attendanceListener);
+        ServiceListener<AttendanceRequest> attendance = new ServiceListener<>(services.getSystemService()::checkAttendance);
+        EventDispatcher.addEvent(Event.Attendance, attendance);
         
-        FunctionListener<ResponseWrapper> createOrderListener = new FunctionListener<>(services.getSystemService()::createOrder);
-        EventDispatcher.addEvent(Event.CreateOrder, createOrderListener);
+        FunctionListener<ResponseWrapper> createOrder = new FunctionListener<>(services.getSystemService()::createOrder);
+        EventDispatcher.addEvent(Event.CreateOrder, createOrder);
 
-        ServiceListener<OrderRequest> submitOrderListener = new ServiceListener<>(services.getSystemService()::submitOrder);
-        EventDispatcher.addEvent(Event.SubmitOrder, submitOrderListener);
+        FunctionListener<ResponseWrapper> getDishes = new FunctionListener<>(services.getSystemService()::getDishes);
+        EventDispatcher.addEvent(Event.GetDishes, getDishes);
 
-        FunctionListener<ResponseWrapper> logoutListener = new FunctionListener<>(services.getSystemService()::doLogout);
-        EventDispatcher.addEvent(Event.Logout, logoutListener);
+        ServiceListener<OrderRequest> submitOrder = new ServiceListener<>(services.getSystemService()::submitOrder);
+        EventDispatcher.addEvent(Event.SubmitOrder, submitOrder);
+
+        FunctionListener<ResponseWrapper> logout = new FunctionListener<>(services.getSystemService()::doLogout);
+        EventDispatcher.addEvent(Event.Logout, logout);
 
         ConsumerListener<UserResponse> bindManagerListener = new ConsumerListener<>(this::bindManagerEvent);
         EventDispatcher.addEvent(Event.BindManagerEvent, bindManagerListener);
@@ -82,10 +85,22 @@ public class System extends Application{
             e.printStackTrace();
             return;
         }
+
         //TODO bind manager services
+        ServiceListener<LocalDate> getAttendanceList = new ServiceListener<>(services.getManagerService()::getAttendances);
+        EventDispatcher.addEvent(Event.GetAttendances, getAttendanceList);
+
+        ServiceListener<UserRequest> updateUser = new ServiceListener<>(services.getManagerService()::updateUser);
+        EventDispatcher.addEvent(Event.UpdateUser, updateUser);
         
-        ServiceListener<LocalDate> getAttendanceListListener = new ServiceListener<>(services.getManagerService()::getAttendances);
-        EventDispatcher.addEvent(Event.GetAttendances, getAttendanceListListener);
+        ServiceListener<UserRequest> deleteUser = new ServiceListener<>(services.getManagerService()::deleteUser);
+        EventDispatcher.addEvent(Event.DeleteUser, deleteUser);
+    
+        ServiceListener<DishRequest> addDish = new ServiceListener<>(services.getManagerService()::addDish);
+        EventDispatcher.addEvent(Event.AddDish, addDish);
+
+        ServiceListener<DishRequest> deleteDish = new ServiceListener<>(services.getManagerService()::deleteDish);
+        EventDispatcher.addEvent(Event.DeleteDish, deleteDish);
     }
 
     private void BindEmployeeEvent(UserResponse user) {
@@ -100,7 +115,7 @@ public class System extends Application{
         }
 
         //TODO bind manager services
-        ServiceListener<ChangePasswordRequest> changePasswordListener = new ServiceListener<>(services.getUserService()::changePassword);
-        EventDispatcher.addEvent(Event.ChangePassword, changePasswordListener);
+        ServiceListener<ChangePasswordRequest> changePassword = new ServiceListener<>(services.getUserService()::changePassword);
+        EventDispatcher.addEvent(Event.ChangePassword, changePassword);
     }
 }

@@ -155,6 +155,9 @@ public abstract class DynamicRepository<T,T1> {
                     writer.newLine();
                 }
             }
+            reader.close();
+            writer.close();
+            
             if (!new File(dataPath).delete()) {
                 throw new IOException("Could not delete original file");
             }

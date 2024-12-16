@@ -84,9 +84,4 @@ public class User {
     public String getFullName() {
         return firstName + " " + lastName;
     }
-
-    // Returns a list of permissions based on the user's role
-    public List<String> getPermissions() {
-        return role.getPermission();
-    }
 }

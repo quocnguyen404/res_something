@@ -30,18 +30,6 @@ import java.util.HashMap;
 
 public class UserGUI extends Application {
 
-    // private ManagerService managerService;
-    // private String loggedInUsername;
-    // public UserManagerGUI(String username) {
-    //     this.loggedInUsername = username;
-    // }
-
-
-    // public UserManagerGUI() {
-    //     // Initialize ManagerService with required repositories
-    //     // this.managerService = new ManagerService(new UserRepository(), new DishRepository());
-    // }
-
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("User Management");
@@ -290,109 +278,8 @@ public class UserGUI extends Application {
                 writer.newLine();
             }
         } catch (IOException e) {
-            showAlert("Error", "Failed to save food item. Error: " + e.getMessage());
+            // showAlert("Error", "Failed to save food item. Error: " + e.getMessage());
             e.printStackTrace();  // In ra chi tiết lỗi
         }
-    }
-
-//    private void createOrder() {
-//        String orderID = JOptionPane.showInputDialog("Enter Order ID");
-//        String dishNames = JOptionPane.showInputDialog("Enter Dish Names (separate with commas)");
-//        String prices = JOptionPane.showInputDialog("Enter Prices for Dishes (separate with commas)");
-//
-//        if (orderID == null || dishNames == null || prices == null || orderID.isEmpty() || dishNames.isEmpty() || prices.isEmpty()) {
-//            JOptionPane.showMessageDialog(null, "All fields must be filled.");
-//            return;
-//        }
-//
-//        String[] dishesArray = dishNames.split(",");
-//        String[] pricesArray = prices.split(",");
-//        Map<String, Integer> dishes = new HashMap<>();
-//        double totalPrice = 0.0;
-//
-//        // Loop through the dishes and prices to build the map and calculate the total price
-//        for (int i = 0; i < dishesArray.length; i++) {
-//            try {
-//                String dish = dishesArray[i].trim();
-//                int price = Integer.parseInt(pricesArray[i].trim());
-//                dishes.put(dish, price);  // Put dish name and price (quantity will be 1 here)
-//                totalPrice += price;  // Add the price to the total
-//            } catch (NumberFormatException e) {
-//                JOptionPane.showMessageDialog(null, "Invalid price format.");
-//                return;
-//            }
-//        }
-//
-//        // Get current time as LocalTime and convert it to string
-//        LocalTime currentTime = LocalTime.now();
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-//
-//        // Pass the calculated total price to the OrderRequest constructor
-//        OrderRequest orderRequest = new OrderRequest(Integer.parseInt(orderID), dishes, totalPrice, currentTime);
-//        saveOrderToFile(orderRequest);
-//        JOptionPane.showMessageDialog(null, "Order created successfully!");
-//    }
-//
-//    private void saveOrderToFile(OrderRequest orderRequest) {
-//        String directoryPath = "order.txt";
-//
-//        try {
-//            File dir = new File(directoryPath);
-//            if (!dir.exists()) {
-//                dir.createNewFile();
-//            }
-//
-//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
-//                // Save order to file
-//                writer.write("Order ID: " + orderRequest.getID());
-//                writer.newLine();
-//
-//                // Get just the dish names from the map, join them as a comma-separated string
-//                String dishesString = String.join(", ", orderRequest.getDishes().keySet());
-//                writer.write("Dishes: " + dishesString);
-//                writer.newLine();
-//
-//                writer.write("Price: " + orderRequest.getPrice());
-//                writer.newLine();
-//
-//                // Format the time to display only HH:mm:ss
-//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-//                String formattedTime = orderRequest.getTime().format(formatter);
-//                writer.write("Time: " + formattedTime);
-//                writer.newLine();
-//
-//                writer.write("-----------------------------------");
-//                writer.newLine();
-//            }
-//        } catch (IOException e) {
-//            showAlert("Error", "Failed to save order.");
-//            e.printStackTrace();
-//        }
-//    }
-//
-
-    // private void saveUserEdit(String username, String password) {
-    //     String directoryPath = "D:\\demo (4)\\res_something\\user_data_edit.txt";
-
-    //     try (BufferedWriter writer = new BufferedWriter(new FileWriter(directoryPath, true))) {
-    //         writer.write(" User: " + username + ", Password: " + password);
-    //         writer.newLine();
-    //     } catch (IOException e) {
-    //         showAlert("Error", "Failed to save user data.");
-    //         e.printStackTrace();
-    //     }
-    // }
-
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

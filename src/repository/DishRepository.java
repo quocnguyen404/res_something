@@ -9,6 +9,7 @@ public class DishRepository extends Repository<String, Dish> {
         DLF = 2;
         DATA_PATH = AppConstant.DATA_PREFIX+"dish"+AppConstant.DATA_SUFFIX;
         TEMP_DATA_PATH = AppConstant.DATA_PREFIX+"dish"+AppConstant.DATA_TEMP_SUFFIX;
+        loadAllDataFromFile();
     }
 
     @Override

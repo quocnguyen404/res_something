@@ -85,38 +85,39 @@ public class ManagerService {
 
     public ResponseWrapper updateUser(UserRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
-
-        if(userRepository.findObjectByKey(request.getUserName()) == null) {
+        User user = userRepository.findObjectByKey(request.getUserName());
+        if(user == null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist user");
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
             return new ResponseWrapper(resultExecute);
         }
 
-        UserMapper mapper = new UserMapper();
-        User user = mapper.toUser(request);
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setRole(request.getRole());
+        
         userRepository.updateObject(user);
+
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Update user success");
-        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
         return new ResponseWrapper(resultExecute);
-
     }
 
     public ResponseWrapper deleteUser(UserRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
-
-        if(userRepository.findObjectByKey(request.getUserName()) == null) {
+        User user = userRepository.findObjectByKey(request.getUserName());
+        if(user == null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist user");
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
             return new ResponseWrapper(resultExecute);
         }
-
-        UserMapper mapper = new UserMapper();
-        User user = mapper.toUser(request);
         userRepository.deleteObject(user);
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Delete user success");
-        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
         return new ResponseWrapper(resultExecute);
     }
     
@@ -163,20 +164,17 @@ public class ManagerService {
     public ResponseWrapper deleteDish(DishRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
 
-        if(dishRepository.findObjectByKey(request.getDishName()) == null) {
+        Dish dish = dishRepository.findObjectByKey(request.getDishName());
+        if(dish == null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist dish");
             return new ResponseWrapper(resultExecute);
         }
 
-        DishMapper mapper = new DishMapper();
-        Dish dish = mapper.toDish(request);
         dishRepository.deleteObject(dish);
-
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
-        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Delete dish success");
-        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(dish));
-
+        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Delete dish:" + dish.getDishName() +" success");
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
         return new ResponseWrapper(resultExecute);
     }
 }
