@@ -7,16 +7,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
 import listener.Event;
-import listener.Listener;
 import system.EventDispatcher;
-import system.SystemUser;
-
-import javax.management.relation.Role;
-
 import dto.request.UserRequest;
-import dto.response.ResponseWrapper;
-import dto.response.UserResponse;
 
 public class RegisterGUI extends Application {
 

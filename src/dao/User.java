@@ -1,6 +1,5 @@
 package dao;
 
-import java.util.List;
 public class User {
     private String userName;
     private String encodePassword;
@@ -17,6 +16,7 @@ public class User {
     public User(String userName, String encodePassword, String password, String firstName, String lastName, int loginCount, Role role) {
         this.userName = userName;
         this.encodePassword = encodePassword;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.loginCount = loginCount;

@@ -4,6 +4,7 @@ import java.time.LocalTime;
 import java.util.Map;
 
 public class OrderRequest {
+    private static int idCount;
     private int id;
     private Map<String,Integer> dishes;
     private double price;
@@ -12,13 +13,14 @@ public class OrderRequest {
     public OrderRequest() {
     }
 
-    public OrderRequest(int id, Map<String,Integer> dishes, double price, LocalTime time) {
-        this.id = id;
+    public OrderRequest(Map<String,Integer> dishes, double price, LocalTime time) {
+        this.id = idCount;
+        idCount++;
         this.dishes = dishes;
         this.price = price;
         this.time = time;
     }
-    
+
     public int getID() {
         return id;
     }

@@ -3,25 +3,26 @@ package dto.response;
 import java.time.LocalTime;
 
 public class AttendanceResponse {
-    private int id;
+    private String userName;
     private LocalTime checkinTime;
     private LocalTime checkoutTime;
     
     public AttendanceResponse() {
     }
     
-    public AttendanceResponse(int id, LocalTime checkinTime, LocalTime checkoutTime) {
-        this.id = id;
+    public AttendanceResponse(String userName, LocalTime checkinTime, LocalTime checkoutTime) {
         this.checkinTime = checkinTime;
         this.checkoutTime = checkoutTime;
     }
     
-    public int getID() {
-        return id;
+    public String getUserName() {
+        return userName;
     }
-    public void setID(int id) {
-        this.id = id;
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
+   
     public LocalTime getCheckinTime() {
         return checkinTime;
     }

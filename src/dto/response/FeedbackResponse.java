@@ -1,34 +1,17 @@
-package dao;
+package dto.response;
 
-public class Feedback {
-    private int id;
+public class FeedbackResponse {
     private int orderID;
     private String customerName;
     private String feedback;
 
-    public Feedback() {
+    public FeedbackResponse() {
     }
 
-    public Feedback(int orderID, String customerName, String feedback) {
-        this.id = hashCode();
+    public FeedbackResponse(int orderID, String customerName, String feedback) {
         this.orderID = orderID;
         this.customerName = customerName;
         this.feedback = feedback;
-    }
-
-    public Feedback(int id, int orderID, String customerName, String feedback) {
-        this.id = id;
-        this.orderID = orderID;
-        this.customerName = customerName;
-        this.feedback = feedback;
-    }
-
-    public int getID() {
-        return id;
-    }
-
-    public void setID(int id) {
-        this.id = id;
     }
 
     public int getOrderID() {

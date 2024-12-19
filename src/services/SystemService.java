@@ -1,94 +1,60 @@
 package services;
 
-import dao.Attendance;
 import dao.Dish;
-import dto.request.AttendanceRequest;
-import dto.request.AuthRequest;
+import dao.Feedback;
+import dto.request.CreateOrderRequest;
+import dto.request.FeedbackRequest;
 import dto.request.OrderRequest;
 import dto.response.CreateOrderResponse;
 import dto.response.DishResponse;
 import dto.response.ResponseWrapper;
 import common.AppConstant;
 import common.Result;
-import dao.User;
-import mapper.AttendanceMapper;
 import mapper.DishMapper;
+import mapper.FeedbackMapper;
 import mapper.OrderMapper;
-import repository.AttendanceRepository;
 import repository.DishRepository;
+import repository.FeedbackRepository;
 import repository.OrderRepository;
-import repository.UserRepository;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SystemService {
-    private final AttendanceRepository attendanceRepository;
     private final OrderRepository orderRepository;
     private final DishRepository dishRepository;
-    private final UserRepository userRepository; // Thêm UserRepository
+    private final FeedbackRepository feedbackRepository;
 
-    public SystemService(AttendanceRepository attendanceRepository, OrderRepository orderRepository, DishRepository dishRepository, UserRepository userRepository) {
-        this.attendanceRepository = attendanceRepository;
+    public SystemService(OrderRepository orderRepository, DishRepository dishRepository, FeedbackRepository feedbackRepository) {
         this.orderRepository = orderRepository;
         this.dishRepository = dishRepository;
-        this.userRepository = userRepository; // Khởi tạo UserRepository
+        this.feedbackRepository = feedbackRepository;
     }
 
-    // Phương thức kiểm tra xác thực người dùng
-    public ResponseWrapper checkAuthentication(AuthRequest authRequest) {
+    public ResponseWrapper createOrder(CreateOrderRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
-        // Tìm người dùng từ UserRepository
-        User user = userRepository.findObjectByKey(authRequest.getUserName());
-
-        if (user != null && user.getPassword().equals(authRequest.getPassword())) {
-            // Nếu tìm thấy người dùng và mật khẩu khớp
-            resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
-            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Login successful");
-            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, user);  // Trả về đối tượng User
-        } else {
-            // Nếu không tìm thấy hoặc mật khẩu không khớp
+        
+        if(request.getDishes().isEmpty()) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
-            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Invalid username or password");
-        }
-
-        return new ResponseWrapper(resultExecute);
-    }
-
-    // Các phương thức khác như checkAttendance, createOrder, submitOrder không thay đổi
-    public ResponseWrapper checkAttendance(AttendanceRequest request) {
-        Map<Object, Object> resultExecute = new HashMap<>();
-        AttendanceMapper mapper = new AttendanceMapper();
-        Attendance attendance = attendanceRepository.findObjectByKey(request.getID());
-
-        if (attendance != null) {
-            if (attendance.getCheckinTime() != null && attendance.getCheckoutTime() == null) {
-                attendance.setCheckoutTime(request.getTime());
-                attendanceRepository.updateObject(attendance);
-                resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
-                resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Check out success");
-                resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(attendance));
-            }
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
+            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Order have no dish");
             return new ResponseWrapper(resultExecute);
         }
 
-        attendance = mapper.toAttendanceCheckin(request);
-        attendanceRepository.saveObject(attendance);
-        resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
-        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Check in success");
-        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(attendance));
-        return new ResponseWrapper(resultExecute);
-    }
+        double price = request.getDishes().entrySet().stream()
+        .mapToDouble(entry -> dishRepository.findObjectByKey(entry.getKey()).getPrice() * entry.getValue())
+        .sum();
 
-    public ResponseWrapper createOrder() {
-        Map<Object, Object> resultExecute = new HashMap<>();
-        OrderRequest orderRequest = new OrderRequest();
-        CreateOrderResponse response = new CreateOrderResponse(dishRepository.getDataList(), orderRequest);
+        OrderRequest orderRequest = new OrderRequest(request.getDishes(), price, LocalTime.now());
+        CreateOrderResponse response = new CreateOrderResponse(request.getDishes(), price, orderRequest.getID());
+        
+        submitOrder(orderRequest);
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.DATA, response);
-        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Get dishes success");
+        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Create order dishes success");
         return new ResponseWrapper(resultExecute);
     }
 
@@ -104,7 +70,7 @@ public class SystemService {
         OrderMapper mapper = new OrderMapper();
         orderRepository.saveObject(mapper.toOrder(request));
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
-        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Create order success");
+        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Submit order success");
 
         return new ResponseWrapper(resultExecute);
     }
@@ -125,9 +91,25 @@ public class SystemService {
         return new ResponseWrapper(resultExecute);
     }
 
-    public ResponseWrapper doLogout() {
+    public ResponseWrapper createFeedback(FeedbackRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
-        //TODO do checkout or something like that
+        feedbackRepository.updateRepository(request.getDate());
+        
+        if(orderRepository.findObjectByKey(request.getOrderID()) == null) {
+            resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
+            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist order ID");
+            return new ResponseWrapper(resultExecute);
+        }
+
+        FeedbackMapper mapper = new FeedbackMapper();
+        Feedback feedback = mapper.toFeedback(request);
+        feedbackRepository.saveObject(feedback);
+
+        resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
+        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Create feedback succes");
+
         return new ResponseWrapper(resultExecute);
     }
 }

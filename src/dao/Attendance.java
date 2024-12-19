@@ -3,26 +3,27 @@ package dao;
 import java.time.LocalTime;
 
 public class Attendance {
-    private int id;
+    private String userName;
     private LocalTime checkinTime;
     private LocalTime checkoutTime;
 
     public Attendance() {
     }
 
-    public Attendance(int id, LocalTime checkinTime, LocalTime checkoutTime) {
-        this.id = id;
+    public Attendance(String userName, LocalTime checkinTime, LocalTime checkoutTime) {
+        this.userName = userName;
         this.checkinTime = checkinTime;
         this.checkoutTime = checkoutTime;
     }
 
-    public int getID() {
-        return id;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setID(int id) {
-        this.id = id;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
+    
     public LocalTime getCheckinTime() {
         return checkinTime;
     }

@@ -3,7 +3,6 @@ package gui;
 
 import javax.swing.JOptionPane;
 
-import dto.request.DishRequest;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -11,6 +10,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
+import dto.request.DishRequest;
 import listener.Event;
 import system.EventDispatcher;
 
@@ -57,16 +58,22 @@ public class FoodManagementGUI extends Application {
         });
 
         updateDishButton.setOnAction(e -> {
-
+            EventDispatcher.invoke(Event.UpdateDishUI, childStage);
         });
 
         viewDishes.setOnAction(e -> {
-
-            // dishes.getItems().addAll()
+            dishes.getItems().clear();
+            EventDispatcher.invoke(Event.GetDishes);
+            EventDispatcher.invoke(Event.HandleViewDishes, dishes);
         });
 
-        backButton.setOnAction(e -> {
-
+        backButton.setOnAction(event -> {
+            primaryStage.close();
+            try {
+                this.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         Scene scene = new Scene(gridPane, 400, 300);

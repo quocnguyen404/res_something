@@ -1,34 +1,21 @@
-package dao;
+package dto.request;
 
-public class Feedback {
-    private int id;
+import java.time.LocalDate;
+
+public class FeedbackRequest {
     private int orderID;
     private String customerName;
     private String feedback;
+    private LocalDate date;
 
-    public Feedback() {
+    public FeedbackRequest() {
     }
 
-    public Feedback(int orderID, String customerName, String feedback) {
-        this.id = hashCode();
+    public FeedbackRequest(int orderID, String customerName, String feedback, LocalDate date) {
         this.orderID = orderID;
         this.customerName = customerName;
         this.feedback = feedback;
-    }
-
-    public Feedback(int id, int orderID, String customerName, String feedback) {
-        this.id = id;
-        this.orderID = orderID;
-        this.customerName = customerName;
-        this.feedback = feedback;
-    }
-
-    public int getID() {
-        return id;
-    }
-
-    public void setID(int id) {
-        this.id = id;
+        this.date = date;
     }
 
     public int getOrderID() {
@@ -53,5 +40,13 @@ public class Feedback {
 
     public void setFeedback(String feedback) {
         this.feedback = feedback;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }

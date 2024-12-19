@@ -2,7 +2,8 @@ package gui;
 
 import dao.Role;
 import dto.response.AttendanceResponse;
-import dto.response.ResponseWrapper;
+import dto.response.DishResponse;
+import dto.response.FeedbackResponse;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import listener.Event;
@@ -12,7 +13,15 @@ import system.SystemUser;
 
 public class UIUtilities {
     public static String attendanceResponseToStr(AttendanceResponse response) {
-        return String.format("%s, %s, %s", response.getID(), response.getCheckinTime(), response.getCheckoutTime());
+        return String.format("User: %s Check in: %s, Check out: %s", response.getUserName(), response.getCheckinTime(), response.getCheckoutTime());
+    }
+
+    public static String dishResponseToStr(DishResponse response) {
+        return String.format("%s: %s", response.getDishName(), response.getPrice());
+    }
+
+    public static String feedbackResponseToStr(FeedbackResponse response) {
+        return String.format("Order ID: %s Customer name: %s Feedback: %s", response.getOrderID(), response.getCustomerName(), response.getFeedback());
     }
 
     public static Boolean validateInput(String input) {

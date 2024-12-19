@@ -3,23 +3,25 @@ package dto.request;
 import java.time.LocalTime;
 
 public class AttendanceRequest {
-    private int id;
+    private String userName;
     private LocalTime time;
 
     public AttendanceRequest() {
     }
 
-    public AttendanceRequest(int id, LocalTime time) {
-        this.id = id;
+    public AttendanceRequest(String userName, LocalTime time) {
+        this.userName = userName;
         this.time = time;
     }
 
-    public int getID() {
-        return id;
+    public String getUserName() {
+        return userName;
     }
-    public void setID(int id) {
-        this.id = id;
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
+
     public LocalTime getTime() {
         return time;
     }

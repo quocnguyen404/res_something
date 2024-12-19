@@ -34,16 +34,16 @@ public class UserRepository extends Repository<String, User> {
     @Override
     protected User dataToObject(String[] tokens) {
         return new User(tokens[0], tokens[1],
-                             tokens[2], tokens[3],
-                             tokens[4], Integer.parseInt(tokens[5]),
-                             Role.valueOf(tokens[6]));
+                        tokens[2], tokens[3],
+                        tokens[4], Integer.parseInt(tokens[5]),
+                        Role.valueOf(tokens[6]));
     }
 
     @Override
     protected String objectToData(User obj) {
         return String.format("%s,%s,%s,%s,%s,%s,%s", obj.getUserName(), obj.getEncodePassword(),
-                                                         obj.getPassword(), obj.getFirstName(),
-                                                         obj.getLastName(), obj.getLoginCount(),
-                                                         obj.getRole());
+                                                            obj.getPassword(), obj.getFirstName(),
+                                                            obj.getLastName(), obj.getLoginCount(),
+                                                            obj.getRole());
     }
 }

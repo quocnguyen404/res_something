@@ -1,9 +1,5 @@
 package services;
 
-import repository.AttendanceRepository;
-import repository.DishRepository;
-import repository.UserRepository;
-import utilities.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,30 +7,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import repository.AttendanceRepository;
+import repository.DishRepository;
+import repository.FeedbackRepository;
+import repository.UserRepository;
 import common.AppConstant;
 import common.Result;
 import dao.Attendance;
 import dao.Dish;
+import dao.Feedback;
 import dao.User;
 import dto.request.DishRequest;
+import dto.request.UpdateDishRequest;
 import dto.request.UserRequest;
 import dto.response.AttendanceResponse;
+import dto.response.FeedbackResponse;
 import dto.response.ResponseWrapper;
 import mapper.AttendanceMapper;
 import mapper.DishMapper;
-import mapper.UserMapper;
+import mapper.FeedbackMapper;
 
 public class ManagerService {
     private final UserRepository userRepository;
     private final DishRepository dishRepository;
     private final AttendanceRepository attendanceRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final FeedbackRepository feedbackRepository;
 
-    public ManagerService(UserRepository userRepository, DishRepository dishRepository, AttendanceRepository attendanceRepository) {
+    public ManagerService(UserRepository userRepository, DishRepository dishRepository, AttendanceRepository attendanceRepository, FeedbackRepository feedbackRepository) {
         this.userRepository = userRepository;
         this.dishRepository = dishRepository;
         this.attendanceRepository = attendanceRepository;
-        passwordEncoder = new PasswordEncoder();
+        this.feedbackRepository = feedbackRepository;
     }
 
     //Check attendance
@@ -61,28 +64,31 @@ public class ManagerService {
         return new ResponseWrapper(resultExecute);
     }
 
-    //User management
-    public ResponseWrapper createUser(UserRequest request) {
+    //Get feedbacks
+    public ResponseWrapper getFeedbacks(LocalDate date) {
         Map<Object, Object> resultExecute = new HashMap<>();
-        
-        if(userRepository.findObjectByKey(request.getUserName()) != null) {
+        List<Feedback> feedbacks = feedbackRepository.getAllDataFromFIle(date);
+
+        if(feedbacks == null || feedbacks.isEmpty()) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
-            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Adready exist user");
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
+            resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Have no feedback at " + date.toString());
             return new ResponseWrapper(resultExecute);
         }
-        String encodePassword = passwordEncoder.encode(request.getPassword());
-        UserMapper mapper = new UserMapper();
 
-        User user = mapper.toUser(request);
-        user.setEncodePassword(encodePassword);
-        userRepository.saveObject(user);
-        
+        FeedbackMapper mapper = new FeedbackMapper();
+        List<FeedbackResponse> response = new ArrayList<>(feedbacks.size());
+        for (Feedback feedback : feedbacks) {
+            response.add(mapper.toResponse(feedback));
+        }
+
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
-        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Create user success");
-        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(user));
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, response);
+        resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Get feedbacks success");
         return new ResponseWrapper(resultExecute);
     }
 
+    //User management
     public ResponseWrapper updateUser(UserRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
         User user = userRepository.findObjectByKey(request.getUserName());
@@ -141,22 +147,29 @@ public class ManagerService {
         return new ResponseWrapper(resultExecute);
     }
 
-    public ResponseWrapper updateDish(DishRequest request) {
+    public ResponseWrapper updateDish(UpdateDishRequest request) {
         Map<Object, Object> resultExecute = new HashMap<>();
         
-        if(dishRepository.findObjectByKey(request.getDishName()) == null) {
+        Dish oldDish = dishRepository.findObjectByKey(request.getDishName());
+        if(oldDish == null) {
             resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.NotOK());
             resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Not exist dish");
+            resultExecute.put(AppConstant.RESPONSE_KEY.DATA, null);
             return new ResponseWrapper(resultExecute);
         }
 
         DishMapper mapper = new DishMapper();
-        Dish dish = mapper.toDish(request);
-        dishRepository.updateObject(dish);
+        Dish newDish = mapper.toDish(request);
+        if(!request.getNewDishName().equals(oldDish.getDishName())) {
+            dishRepository.deleteObject(oldDish);
+            dishRepository.saveObject(newDish);
+        } else {
+            dishRepository.updateObject(newDish);
+        }
 
         resultExecute.put(AppConstant.RESPONSE_KEY.RESULT, Result.OK());
         resultExecute.put(AppConstant.RESPONSE_KEY.MESSAGE, "Update dish success");
-        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(dish));
+        resultExecute.put(AppConstant.RESPONSE_KEY.DATA, mapper.toResponse(newDish));
 
         return new ResponseWrapper(resultExecute);
     }

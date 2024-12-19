@@ -8,6 +8,4 @@ public class AppUtilities {
             return null;
         return LocalTime.parse(str);
     }
-
-
 }

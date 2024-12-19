@@ -5,12 +5,11 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import listener.Event;
-import listener.Listener;
 import system.EventDispatcher;
-import system.SystemUser;
 
 public class ChangePasswordGUI extends Application {
 
@@ -47,22 +46,13 @@ public class ChangePasswordGUI extends Application {
             String currentPassword = currentPasswordField.getText();
             String newPassword = newPasswordField.getText();
             String confirmPassword = confirmPasswordField.getText();
-            
-            EventDispatcher.invoke(Event.GetSystemUser);
-            Listener listener = EventDispatcher.getListener(Event.GetSystemUser);
-            SystemUser user = listener.getData();
-            listener.clearData();
-            
-            ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest(user.getUserName(), currentPassword, newPassword, confirmPassword);
-            EventDispatcher.invoke(Event.ChangePassword, changePasswordRequest);
-            EventDispatcher.invoke(Event.HandleChangePassword);
 
-            stage.close();
-            try {
-                this.stop();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if(!UIUtilities.validateInput(currentPassword) || !UIUtilities.validateInput(newPassword) || !UIUtilities.validateInput(confirmPassword)) {
+                UIUtilities.showAlert("Information", "Please fill all field", AlertType.INFORMATION);
+                return;
             }
+            ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest(null, currentPassword, newPassword, confirmPassword);
+            EventDispatcher.invoke(Event.HandleChangePassword, changePasswordRequest);
         });
 
         Scene scene = new Scene(gridPane, 400, 200);
