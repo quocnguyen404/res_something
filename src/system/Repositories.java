@@ -2,7 +2,7 @@ package system;
 
 import repository.AttendanceRepository;
 import repository.DishRepository;
-import repository.EmployeeRepository;
+// import repository.EmployeeRepository;
 import repository.FeedbackRepository;
 import repository.OrderRepository;
 // import repository.StatisticsRepository;
@@ -10,7 +10,7 @@ import repository.UserRepository;
 
 class Repositories {
     private UserRepository userRepository;
-    private EmployeeRepository employeeRepository;
+    // private EmployeeRepository employeeRepository;
     private DishRepository dishRepository;
     private AttendanceRepository attendanceRepository;
     private FeedbackRepository feedbackRepository;
@@ -19,7 +19,7 @@ class Repositories {
 
     Repositories() {
         userRepository = new UserRepository();
-        employeeRepository = new EmployeeRepository();
+        // employeeRepository = new EmployeeRepository();
         dishRepository = new DishRepository();
         attendanceRepository = new AttendanceRepository();
         feedbackRepository = new FeedbackRepository();
@@ -31,9 +31,9 @@ class Repositories {
         return userRepository;
     }
 
-    public EmployeeRepository getEmployeeRepository() {
-        return employeeRepository;
-    }
+    // public EmployeeRepository getEmployeeRepository() {
+    //     return employeeRepository;
+    // }
 
     public DishRepository getDishRepository() {
         return dishRepository;

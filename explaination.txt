@@ -1,0 +1,43 @@
+App lấy ý tưởng từ module mvc:
+    - Client yêu cầu thông tin bằng các request
+    - Server trả lời request bằng response
+    - Phân quyền bằng Role của User bằng cách bind các events của từng quyền riêng
+
+App chia ra làm 4 phần: Repository, Service, System, UI
+Repository:
+    - có nhiệm vụ lưu dữ liệu, cập nhật dữ liệu, xóa dữ liệu
+    - tải dữ liệu từ file
+    - viết dữ liệu vào file
+Repository chia làmm 2 loại:
+    - Static: Repository class
+        + xử lý dữ liệu cố định như thông tin của người dùng, thông tin của món ăn
+        + đặc điểm: chỉ có một file dữ liệu
+        + các class kế thừa từ Repository: DishRepository, UserRepository
+    - Dynamic: DynamicRepository class
+        + xử lý dữ liệu cập nhật theo ngày như điểm danh của nhân viên, feedback của khách hàng, hóa đơn của khách hàng
+        + đặc điểm: có nhiều file dữ liệu, mỗi lần truy cập vào file khác ngày có thể tốn nhiều thời gian
+        + các class kế thừa từ DynamicRepository: AttendanceRepository, FeedbackRepository, OrderRepository
+
+
+Service:
+    - có nhiệm vụ nhận các request của client và xử lý các request đó
+    - có các loại services thể hiện qua các class: AuthService, ManagerService, SystemService, UserService, DevService
+    - các service thường sẽ nhận một loại request hoặc không nhận gì
+    - các service luôn luôn trả về một HashMap chứa 3 loại interface object: RESULT, DATA, MESSAGE
+        RESULT: sẽ có 2 loại, Result.OK() và Result.NotOK()
+        DATA: là response mà client yêu cầu
+        MESSAGE: thông tin cung cấp cho client
+    - các class service khác nhau chứa services cho các user khác nhau
+    Ví dụ:
+    - service checkin trong UserService, hàm này sẽ nhận AttendanceRequest nếu user đã checkin thì trả về message "đã checkin", nếu chưa
+    thì checkin trên hệ thống
+
+System:
+    - System đóng vai trò như người trung gian nối tất cả các thành phần khác với nhau:
+        + nối repository và services với nhau: services cần dữ liệu để xử lý request của client
+        + nối services và UI với nhau: UI cần services để gửi request và nhận response
+        + Event System là cách để nối các thành phần với nhau
+    - System còn là nơi khởi tạo các repository và services
+
+UI:
+    - UI là nơi chứa các GUI để nhận các data để tạo request
